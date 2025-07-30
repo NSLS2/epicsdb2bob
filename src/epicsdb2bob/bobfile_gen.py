@@ -5,12 +5,14 @@ from uuid import uuid4
 import phoebusgen
 import phoebusgen.screen
 from dbtoolspy import Database, Record
-from phoebusgen.widget import LED, ChoiceButton, Label, Rectangle, TextEntry, TextUpdate
+from phoebusgen.widget import LED, ChoiceButton, Label, Rectangle, TextEntry, TextUpdate, ComboBox
 
 logger = logging.getLogger("epicsdb2bob")
 
 MAX_HEIGHT = 1200
 OFFSET = 10
+
+TITLE_BAR_HEIGHT = 50
 
 DEFAULT_WIDGET_WIDTH = 150
 DEFAULT_WIDGET_HEIGHT = 20
@@ -110,16 +112,36 @@ def add_choice_button_widget(record: Record, start_x: int, start_y: int) -> list
     )
     return widgets_to_add
 
+def add_combo_box_widget(record: Record, start_x: int, start_y: int) -> list[Any]:
+    widgets_to_add: list[Any] = []
+    widgets_to_add.append(add_label_for_record(record, start_x, start_y))
+
+    current_x = start_x + DEFAULT_WIDGET_WIDTH + OFFSET
+    current_y = start_y
+    widgets_to_add.append(
+        ComboBox(
+            short_uuid(),
+            str(record.name),
+            current_x,
+            current_y,
+            DEFAULT_WIDGET_WIDTH,
+            DEFAULT_WIDGET_HEIGHT,
+        )
+    )
+    return widgets_to_add
+
 
 def generate_bobfile_for_db(name: str, database: Database) -> phoebusgen.screen.Screen:
     screen = phoebusgen.screen.Screen(name)
 
     current_x_pos = OFFSET
-    current_y_pos = OFFSET
+    current_y_pos = 2 * OFFSET + TITLE_BAR_HEIGHT
 
     records_seen = []
 
     record_types_to_funcs = {
+        "mbbo": add_combo_box_widget,
+        "mbbi": add_text_update_widget,
         "bo": add_choice_button_widget,
         "bi": add_led_widget,
         "ao": add_text_entry_widget,
@@ -142,16 +164,46 @@ def generate_bobfile_for_db(name: str, database: Database) -> phoebusgen.screen.
                 screen.add_widget(widget)
                 records_seen.append(record.name)
                 current_y_pos += DEFAULT_WIDGET_HEIGHT
-                if current_y_pos > MAX_HEIGHT:
+                if current_y_pos > MAX_HEIGHT - TITLE_BAR_HEIGHT:
                     screen.add_widget(
                         Rectangle(
                             short_uuid(),
                             current_x_pos + 2 * (DEFAULT_WIDGET_WIDTH + OFFSET),
-                            OFFSET,
+                            OFFSET + TITLE_BAR_HEIGHT,
                             2,
-                            MAX_HEIGHT,
+                            MAX_HEIGHT - TITLE_BAR_HEIGHT - OFFSET,
                         )
                     )
-                    current_y_pos = OFFSET
+                    current_y_pos = 2 * OFFSET + TITLE_BAR_HEIGHT
                     current_x_pos += 2 * (DEFAULT_WIDGET_WIDTH + OFFSET) + OFFSET
+
+    screen_width = current_x_pos + 2* (DEFAULT_WIDGET_WIDTH + OFFSET)
+    screen_height = MAX_HEIGHT + OFFSET
+    
+    title_bar = Rectangle(
+        short_uuid(),
+        0,
+        0,
+        screen_width,
+        TITLE_BAR_HEIGHT,
+    )
+    screen.add_widget(title_bar)
+
+    title = Label(
+        short_uuid(),
+        name,
+        0,
+        0,
+        screen_width,
+        TITLE_BAR_HEIGHT,
+    )
+    title.foreground_color(255,255,255)
+    title.font_size(32)
+    title.horizontal_alignment_center()
+    title.vertical_alignment_middle()
+    screen.add_widget(title)
+
+    screen.height(screen_height)
+    screen.width(screen_width)
+
     return screen
