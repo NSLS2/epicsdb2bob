@@ -75,7 +75,9 @@ def main() -> None:
         macros=macros_dict if macros_dict else None,
     )
     for name in databases:
-        generate_bobfile_for_db(name, databases[name])
+        screen = generate_bobfile_for_db(name, databases[name])
+        logger.info(f"Generated screen for database: {name}")
+        screen.write_screen(os.path.join(args.output, f"{name}.bob"))
 
 
 def find_epics_dbs_templates_and_subs(
@@ -95,12 +97,6 @@ def find_epics_dbs_templates_and_subs(
                     logger.warning(
                         f"Failed to parse {full_file_path} as an EPICS database"
                     )
-            # elif file.endswith(".substitutions") and include_subs:
-            #     try:
-            #         epics_databases[file.split(".", -1)[0]] = load_template_file(full_file_path)
-            #         logger.info(f"Parsed {full_file_path}")
-            #     except:
-            #         logger.warning(f"Failed to parse {full_file_path} as an EPICS substitution template")
 
     return epics_databases
 
