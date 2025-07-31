@@ -24,7 +24,7 @@ jobs:
           python-version: '3.x'
 
       - name: Install pre-commit
-        run: pip install pre-commit
+        run: pip install .
 
       - name: Run pre-commit
         run: pre-commit run --all-files
