@@ -27,12 +27,6 @@ def main() -> None:
         version=__version__,
     )
     parser.add_argument(
-        "-o",
-        "--one-file",
-        action="store_true",
-        help="Generate a single bob file for all discovered records",
-    )
-    parser.add_argument(
         "-s",
         "--substitutions",
         action="store_true",
@@ -65,6 +59,8 @@ def main() -> None:
         default="minimal",
     )
 
+    parser.add_argument("-r", "--readback_suffix", type=str, default="_RBV")
+
     args = parser.parse_args()
 
     logger.setLevel(logging.INFO)
@@ -84,7 +80,10 @@ def main() -> None:
     )
     for name in databases:
         screen = generate_bobfile_for_db(
-            name, databases[name], title_bar_size=args.title_bar
+            name,
+            databases[name],
+            title_bar_size=args.title_bar,
+            readback_suffix=args.readback_suffix,
         )
         logger.info(f"Generated screen for database: {name}")
         screen.write_screen(os.path.join(args.output, f"{name}.bob"))
