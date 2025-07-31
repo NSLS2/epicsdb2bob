@@ -1,4 +1,4 @@
-name: Lint and Pre-commit Checks
+name: CI
 permissions:
   contents: read
 
