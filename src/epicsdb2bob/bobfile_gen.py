@@ -5,14 +5,22 @@ from uuid import uuid4
 import phoebusgen
 import phoebusgen.screen
 from dbtoolspy import Database, Record
-from phoebusgen.widget import LED, ChoiceButton, Label, Rectangle, TextEntry, TextUpdate, ComboBox
+from phoebusgen.widget import (
+    LED,
+    ChoiceButton,
+    ComboBox,
+    Label,
+    Rectangle,
+    TextEntry,
+    TextUpdate,
+)
 
 logger = logging.getLogger("epicsdb2bob")
 
 MAX_HEIGHT = 1200
 OFFSET = 10
 
-TITLE_BAR_HEIGHT = 50
+TITLE_BAR_HEIGHTS = {"none": 0, "minimal": 10, "full": 50}
 
 DEFAULT_WIDGET_WIDTH = 150
 DEFAULT_WIDGET_HEIGHT = 20
@@ -112,6 +120,7 @@ def add_choice_button_widget(record: Record, start_x: int, start_y: int) -> list
     )
     return widgets_to_add
 
+
 def add_combo_box_widget(record: Record, start_x: int, start_y: int) -> list[Any]:
     widgets_to_add: list[Any] = []
     widgets_to_add.append(add_label_for_record(record, start_x, start_y))
@@ -131,11 +140,14 @@ def add_combo_box_widget(record: Record, start_x: int, start_y: int) -> list[Any
     return widgets_to_add
 
 
-def generate_bobfile_for_db(name: str, database: Database) -> phoebusgen.screen.Screen:
+def generate_bobfile_for_db(
+    name: str, database: Database, title_bar_size: str
+) -> phoebusgen.screen.Screen:
     screen = phoebusgen.screen.Screen(name)
 
     current_x_pos = OFFSET
-    current_y_pos = 2 * OFFSET + TITLE_BAR_HEIGHT
+    current_y_pos = 2 * OFFSET + TITLE_BAR_HEIGHTS[title_bar_size]
+    hit_max_y_pos = False
 
     records_seen = []
 
@@ -164,44 +176,62 @@ def generate_bobfile_for_db(name: str, database: Database) -> phoebusgen.screen.
                 screen.add_widget(widget)
                 records_seen.append(record.name)
                 current_y_pos += DEFAULT_WIDGET_HEIGHT
-                if current_y_pos > MAX_HEIGHT - TITLE_BAR_HEIGHT:
-                    screen.add_widget(
-                        Rectangle(
-                            short_uuid(),
-                            current_x_pos + 2 * (DEFAULT_WIDGET_WIDTH + OFFSET),
-                            OFFSET + TITLE_BAR_HEIGHT,
-                            2,
-                            MAX_HEIGHT - TITLE_BAR_HEIGHT - OFFSET,
-                        )
+                if current_y_pos > MAX_HEIGHT - TITLE_BAR_HEIGHTS[title_bar_size]:
+                    hit_max_y_pos = True
+                    dividing_line = Rectangle(
+                        short_uuid(),
+                        current_x_pos + 2 * (DEFAULT_WIDGET_WIDTH + OFFSET),
+                        OFFSET + TITLE_BAR_HEIGHTS[title_bar_size],
+                        2,
+                        MAX_HEIGHT - TITLE_BAR_HEIGHTS[title_bar_size] - OFFSET,
                     )
-                    current_y_pos = 2 * OFFSET + TITLE_BAR_HEIGHT
+                    dividing_line.line_color(0, 0, 0)
+                    screen.add_widget(dividing_line)
+                    current_y_pos = 2 * OFFSET + TITLE_BAR_HEIGHTS[title_bar_size]
                     current_x_pos += 2 * (DEFAULT_WIDGET_WIDTH + OFFSET) + OFFSET
 
-    screen_width = current_x_pos + 2* (DEFAULT_WIDGET_WIDTH + OFFSET)
-    screen_height = MAX_HEIGHT + OFFSET
-    
-    title_bar = Rectangle(
-        short_uuid(),
-        0,
-        0,
-        screen_width,
-        TITLE_BAR_HEIGHT,
-    )
-    screen.add_widget(title_bar)
+    screen_width = current_x_pos + 2 * (DEFAULT_WIDGET_WIDTH + OFFSET)
+    if hit_max_y_pos:
+        screen_height = MAX_HEIGHT + OFFSET
+    else:
+        screen_height = current_y_pos + OFFSET
 
-    title = Label(
-        short_uuid(),
-        name,
-        0,
-        0,
-        screen_width,
-        TITLE_BAR_HEIGHT,
-    )
-    title.foreground_color(255,255,255)
-    title.font_size(32)
-    title.horizontal_alignment_center()
-    title.vertical_alignment_middle()
-    screen.add_widget(title)
+    if title_bar_size != "none":
+        title_bar = Label(
+            short_uuid(),
+            name,
+            OFFSET,
+            0,
+            screen_width - OFFSET,
+            TITLE_BAR_HEIGHTS[title_bar_size],
+        )
+        title_bar.foreground_color(255, 255, 255)
+        if title_bar_size == "full":
+            title_bar.font_size(32)
+            title_bar.horizontal_alignment_center()
+        elif title_bar_size == "minimal":
+            title_bar.auto_size()
+            title_bar.font_size(18)
+            title_bar.border_width(2)
+            title_bar.border_color(0, 0, 0)
+            border = Rectangle(
+                short_uuid(),
+                0,
+                int(TITLE_BAR_HEIGHTS[title_bar_size] / 2) + 1,
+                screen_width,
+                screen_height - int(TITLE_BAR_HEIGHTS[title_bar_size] / 2),
+            )
+            border.transparent(True)
+            border.line_width(2)
+            border.line_color(0, 0, 0)
+            screen.add_widget(border)
+
+        title_bar.background_color(100, 100, 100)
+        title_bar.transparent(False)
+        title_bar.vertical_alignment_middle()
+        screen.add_widget(title_bar)
+
+    screen.background_color(179, 179, 179)
 
     screen.height(screen_height)
     screen.width(screen_width)

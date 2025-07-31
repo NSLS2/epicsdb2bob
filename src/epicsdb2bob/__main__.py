@@ -57,6 +57,14 @@ def main() -> None:
         "-d", "--debug", action="store_true", help="Enable debug logging"
     )
 
+    parser.add_argument(
+        "-t",
+        "--title_bar",
+        type=str,
+        choices=["none", "minimal", "full"],
+        default="minimal",
+    )
+
     args = parser.parse_args()
 
     logger.setLevel(logging.INFO)
@@ -75,7 +83,9 @@ def main() -> None:
         macros=macros_dict if macros_dict else None,
     )
     for name in databases:
-        screen = generate_bobfile_for_db(name, databases[name])
+        screen = generate_bobfile_for_db(
+            name, databases[name], title_bar_size=args.title_bar
+        )
         logger.info(f"Generated screen for database: {name}")
         screen.write_screen(os.path.join(args.output, f"{name}.bob"))
 
