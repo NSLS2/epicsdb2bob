@@ -106,7 +106,7 @@ lint.select = [
     "SLF", # self - https://docs.astral.sh/ruff/settings/#lintflake8-self
 ]
 exclude = [
-    "src/_version.py",
+    "src/epicsdb2bob/_version.py",
 ]
 
 [tool.ruff.lint.per-file-ignores]
