@@ -2,6 +2,7 @@ import os
 from enum import Enum
 from pathlib import Path
 from dataclasses import dataclass, field
+from typing import Any
 
 import yaml
 from phoebusgen import widget as phoebusgen_widget
@@ -75,14 +76,14 @@ class EPICSDB2BOBConfig:
     title_bar_color: tuple[int, int, int] = (218, 218, 218)
 
     @staticmethod
-    def from_yaml(file_path: Path, cli_args: dict[str, str]) -> "EPICSDB2BOBConfig":
+    def from_yaml(file_path: Path, cli_args: dict[str, Any]) -> "EPICSDB2BOBConfig":
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"Config file {file_path} does not exist.")
 
+        data = cli_args.copy()
         with open(file_path) as f:
-            data = yaml.safe_load(f)
+            data.update(yaml.safe_load(f))
 
-        data.update(cli_args)
 
         rtyp_to_widget_map = DEFAULT_RTYP_TO_WIDGET_MAP.copy()
         if "rtyp_to_widget_map" in data:
@@ -144,8 +145,8 @@ class EPICSDB2BOBConfig:
                 TitleBarFormat.FULL: data.get("title_bar_heights", {}).get("full", 40),
             },
             widget_widths={LED: data.get("widget_widths", {}).get("LED", 20)},
-            background_color=tuple(data.get("background_color", (187, 187, 187))),
-            title_bar_color=tuple(data.get("title_bar_color", (218, 218, 218))),
+            background_color=tuple(data.get("background_color", (187, 187, 187))), #type: ignore
+            title_bar_color=tuple(data.get("title_bar_color", (218, 218, 218))), #type: ignore
         )
 
     def __str__(self):

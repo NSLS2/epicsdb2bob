@@ -119,6 +119,13 @@ def main() -> None:
         choices=WIDGET_PALETTES.keys(),
         help="Color palette to use.",
     )
+    parser.add_argument(
+        "--macro_set_level",
+        type=str,
+        choices=["launcher", "screen", "widget"],
+        default="launcher",
+        help="Level at which to apply macros when generating screens.",
+    )
 
     args = parser.parse_args()
 
