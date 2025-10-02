@@ -68,6 +68,7 @@ def add_widget_for_record(
     record: Record,
     start_x: int,
     start_y: int,
+    macros: dict[str, str],
     config: EPICSDB2BOBConfig,
     readback_record: Record | None = None,
     with_label: bool = True,
@@ -86,7 +87,7 @@ def add_widget_for_record(
 
     pv_name = record.name if record.name is not None else ""
     if config.macro_set_level != MacroSetLevel.WIDGET:
-        for macro_name, macro_value in config.macros.items():
+        for macro_name, macro_value in macros.items():
             pv_name = pv_name.replace(macro_value, f"$({macro_name})")
 
     widget = widget_type(
@@ -121,6 +122,7 @@ def add_widget_for_record(
                 readback_record,
                 current_x,
                 start_y,
+                macros,
                 config,
                 with_label=False,
             )
@@ -182,7 +184,7 @@ def add_border(screen: Screen, config: EPICSDB2BOBConfig) -> Rectangle:
 
 
 def generate_bobfile_for_db(
-    name: str, database: Database, config: EPICSDB2BOBConfig
+    name: str, database: Database, macros: dict[str, str], config: EPICSDB2BOBConfig
 ) -> Screen:
     screen = Screen(name)
 
@@ -214,7 +216,7 @@ def generate_bobfile_for_db(
                         max_widgets_in_row = 3
 
                 for widget in add_widget_for_record(
-                    record, current_x_pos, current_y_pos, config
+                    record, current_x_pos, current_y_pos, macros, config, readback_record=readback_record
                 ):
                     logger.info(
                         f"Adding {widget.__class__.__name__} widget for {record.name}"
@@ -281,7 +283,7 @@ def generate_bobfile_for_db(
     screen.width(screen_width)
 
     if config.macro_set_level == MacroSetLevel.SCREEN:
-        for macro in config.macros.items():
+        for macro in macros.items():
             screen.macro(macro[0], macro[1])
 
     logger.info(f"Generated screen for database: {name}")

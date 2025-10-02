@@ -10,7 +10,7 @@ from dbtoolspy import Database, load_database_file, load_template_file
 
 from . import __version__
 from .bobfile_gen import generate_bobfile_for_db, generate_bobfile_for_substitution
-from .config import EPICSDB2BOBConfig
+from .config import EPICSDB2BOBConfig, EmbedLevel, MacroSetLevel, TitleBarFormat
 from .palettes import WIDGET_PALETTES
 from .parser import find_epics_dbs_and_templates, find_epics_subs
 
@@ -136,6 +136,9 @@ def main() -> None:
     else:
         config = EPICSDB2BOBConfig()
         logger.debug("No configuration file found, using defaults.")
+        for key, value in vars(args).items():
+            if value is not None:
+                setattr(config, key, value)
 
     written_bobfiles: dict[str, Path] = {}
 
@@ -147,10 +150,11 @@ def main() -> None:
                     logger.info(f"Found additional bob/opi file: {full_path}")
                     written_bobfiles[filename] = full_path
 
+    macros = {macro.split("=")[0]: macro.split("=")[1] for macro in args.macros} if args.macros else {}
 
-    databases = find_epics_dbs_and_templates(args.input_path, config.macros)
+    databases = find_epics_dbs_and_templates(args.input_path, macros)
     for name in databases:
-        screen = generate_bobfile_for_db(name, databases[name], config)
+        screen = generate_bobfile_for_db(name, databases[name], macros, config)
 
         full_output_path = os.path.join(args.output_path, f"{name}.bob")
         screen.write_screen(full_output_path)

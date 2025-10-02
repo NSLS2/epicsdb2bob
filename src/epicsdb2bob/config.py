@@ -53,7 +53,6 @@ DEFAULT_RTYP_TO_WIDGET_MAP: dict[str, type[Widget]] = {
 class EPICSDB2BOBConfig:
     debug: bool = False
     embed: EmbedLevel = EmbedLevel.SINGLE
-    macros: dict[str, str] = field(default_factory=dict)
     macro_set_level: MacroSetLevel = MacroSetLevel.SCREEN
     title_bar_format: TitleBarFormat = TitleBarFormat.MINIMAL
     rtyp_to_widget_map: dict[str, type[Widget]] = field(default_factory=lambda: DEFAULT_RTYP_TO_WIDGET_MAP)
@@ -124,10 +123,6 @@ class EPICSDB2BOBConfig:
         return EPICSDB2BOBConfig(
             debug=data.get("debug", False),
             embed=EmbedLevel(data.get("embed", "single")),
-            macros={
-                macro.split("=")[0]: macro.split("=")[1]
-                for macro in data.get("macros", {}).items()
-            },
             title_bar_format=TitleBarFormat(data.get("title_bar_format", "minimal")),
             readback_suffix=data.get("readback_suffix", "_RBV"),
             bobfile_search_path=[Path(p) for p in data.get("bobfile_search_path", [])],
@@ -151,4 +146,23 @@ class EPICSDB2BOBConfig:
             widget_widths={LED: data.get("widget_widths", {}).get("LED", 20)},
             background_color=tuple(data.get("background_color", (187, 187, 187))),
             title_bar_color=tuple(data.get("title_bar_color", (218, 218, 218))),
+        )
+
+    def __str__(self):
+        return (
+            f"EPICSDB2BOBConfig(debug={self.debug}, embed={self.embed}, "
+            f"macro_set_level={self.macro_set_level}, "
+            f"title_bar_format={self.title_bar_format}, "
+            f"rtyp_to_widget_map={self.rtyp_to_widget_map}, "
+            f"readback_suffix={self.readback_suffix}, "
+            f"bobfile_search_path={self.bobfile_search_path}, "
+            f"palette={self.palette}, font_size={self.font_size}, "
+            f"default_widget_width={self.default_widget_width}, "
+            f"default_widget_height={self.default_widget_height}, "
+            f"max_screen_height={self.max_screen_height}, "
+            f"widget_offset={self.widget_offset}, "
+            f"title_bar_heights={self.title_bar_heights}, "
+            f"widget_widths={self.widget_widths}, "
+            f"background_color={self.background_color}, "
+            f"title_bar_color={self.title_bar_color})"
         )
