@@ -269,7 +269,7 @@ def generate_bobfile_for_db(
 
     add_title_bar(name, screen, config, screen_width - config.widget_offset)
 
-    if config.title_bar_format == "minimal":
+    if config.title_bar_format == TitleBarFormat.MINIMAL:
         border.width(screen_width)
         border.height(
             screen_height - int(config.title_bar_heights[config.title_bar_format] / 2)
@@ -279,6 +279,12 @@ def generate_bobfile_for_db(
 
     screen.height(screen_height)
     screen.width(screen_width)
+
+    if config.macro_set_level == MacroSetLevel.SCREEN:
+        for macro in config.macros.items():
+            screen.macro(macro[0], macro[1])
+
+    logger.info(f"Generated screen for database: {name}")
 
     return screen
 
@@ -416,5 +422,7 @@ def generate_bobfile_for_substitution(
 
     screen.height(screen_height)
     screen.width(screen_width)
+
+    logger.info(f"Generated screen for substitution: {substitution}")
 
     return screen

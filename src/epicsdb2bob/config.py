@@ -1,7 +1,7 @@
 import os
-from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
+from dataclasses import dataclass, field
 
 import yaml
 from phoebusgen import widget as phoebusgen_widget
@@ -49,30 +49,29 @@ DEFAULT_RTYP_TO_WIDGET_MAP: dict[str, type[Widget]] = {
     "stringin": TextUpdate,
 }
 
-
-@dataclass
+@dataclass(frozen=False)
 class EPICSDB2BOBConfig:
     debug: bool = False
     embed: EmbedLevel = EmbedLevel.SINGLE
-    macros: dict[str, str] = {}
+    macros: dict[str, str] = field(default_factory=dict)
     macro_set_level: MacroSetLevel = MacroSetLevel.SCREEN
     title_bar_format: TitleBarFormat = TitleBarFormat.MINIMAL
-    rtyp_to_widget_map: dict[str, type[Widget]] = DEFAULT_RTYP_TO_WIDGET_MAP
+    rtyp_to_widget_map: dict[str, type[Widget]] = field(default_factory=lambda: DEFAULT_RTYP_TO_WIDGET_MAP)
     readback_suffix: str = "_RBV"
-    bobfile_search_path: list[Path] = []
-    palette: Palette = WIDGET_PALETTES["default"]
+    bobfile_search_path: list[Path] = field(default_factory=list)
+    palette: Palette = field(default_factory=lambda: WIDGET_PALETTES["default"])
     font_size: int = 16
     default_widget_width: int = 150
     default_widget_height: int = 20
     max_screen_height: int = 1200
     widget_offset: int = 10
-    title_bar_heights: dict[TitleBarFormat, int] = {
+    title_bar_heights: dict[TitleBarFormat, int] = field(default_factory=lambda: {
         TitleBarFormat.NONE: 0,
         TitleBarFormat.MINIMAL: 20,
         TitleBarFormat.MINIMAL_CENTERED: 20,
         TitleBarFormat.FULL: 40,
-    }
-    widget_widths: dict[type[Widget], int] = {LED: 20}
+    })
+    widget_widths: dict[type[Widget], int] = field(default_factory=lambda: {LED: 20})
     background_color: tuple[int, int, int] = (187, 187, 187)
     title_bar_color: tuple[int, int, int] = (218, 218, 218)
 

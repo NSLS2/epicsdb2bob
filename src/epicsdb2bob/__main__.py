@@ -12,6 +12,7 @@ from . import __version__
 from .bobfile_gen import generate_bobfile_for_db, generate_bobfile_for_substitution
 from .config import EPICSDB2BOBConfig
 from .palettes import WIDGET_PALETTES
+from .parser import find_epics_dbs_and_templates, find_epics_subs
 
 __all__ = ["main"]
 
@@ -63,12 +64,12 @@ def main() -> None:
     )
 
     parser.add_argument(
-        "input",
+        "input_path",
         type=str,
         help="Path to location in which to search for EPICS database template files",
     )
     parser.add_argument(
-        "output", type=str, help="Output location for generated screens."
+        "output_path", type=str, help="Output location for generated screens."
     )
     parser.add_argument(
         "-d", "--debug", action="store_true", help="Enable debug logging"
@@ -136,27 +137,28 @@ def main() -> None:
         config = EPICSDB2BOBConfig()
         logger.debug("No configuration file found, using defaults.")
 
-    written_bobfiles = {}
-    databases = find_epics_dbs_and_templates(args.input, config.macros)
-    for name in databases:
-        screen = generate_bobfile_for_db(name, databases[name], config)
-        if args.macro_level == "screen":
-            for macro in config.macros.items():
-                screen.macro(macro[0], macro[1])
+    written_bobfiles: dict[str, Path] = {}
 
-        logger.info(f"Generated screen for database: {name}")
-        output_filepath = os.path.join(args.output, f"{name}.bob")
-        screen.write_screen(output_filepath)
-        written_bobfiles[os.path.basename(output_filepath)] = output_filepath
-
-    for addtl_bobfile_dir in args.addtl_bobfile_dirs:
-        for dirpath, _, filenames in os.walk(addtl_bobfile_dir):
+    for bobfile_dir in config.bobfile_search_path:
+        for dirpath, _, filenames in os.walk(bobfile_dir):
             for filename in filenames:
                 if filename.endswith((".bob", ".opi")):
-                    full_path = os.path.join(dirpath, filename)
+                    full_path = Path(os.path.join(dirpath, filename))
+                    logger.info(f"Found additional bob/opi file: {full_path}")
                     written_bobfiles[filename] = full_path
 
-    substitutions = find_epics_subs(args.input)
+
+    databases = find_epics_dbs_and_templates(args.input_path, config.macros)
+    for name in databases:
+        screen = generate_bobfile_for_db(name, databases[name], config)
+
+        full_output_path = os.path.join(args.output_path, f"{name}.bob")
+        screen.write_screen(full_output_path)
+        written_bobfiles[os.path.basename(full_output_path)] = Path(full_output_path)
+
+
+    substitutions = find_epics_subs(args.input_path)
+
     for substitution in substitutions:
         screen = generate_bobfile_for_substitution(
             substitution,
@@ -164,54 +166,10 @@ def main() -> None:
             written_bobfiles,
             args.embed,
         )
-        logger.info(f"Generated screen for substitution: {substitution}")
-        output_filepath = os.path.join(args.output, f"{substitution}.bob")
-        screen.write_screen(output_filepath)
-        written_bobfiles[os.path.basename(output_filepath)] = output_filepath
+        full_output_path = os.path.join(args.output_path, f"{substitution}.bob")
+        screen.write_screen(full_output_path)
+        written_bobfiles[os.path.basename(full_output_path)] = Path(full_output_path)
 
-
-def find_epics_dbs_and_templates(
-    search_path: Path, macros: dict[str, str] | None = None
-) -> dict[str, Database]:
-    epics_databases: dict[str, Database] = {}
-    for dirpath, _, filenames in os.walk(search_path):
-        for file in filenames:
-            full_file_path = os.path.join(dirpath, file)
-            if file.endswith((".db", ".template")):
-                try:
-                    epics_databases[file.split(".", -1)[0]] = load_database_file(
-                        full_file_path, macros=macros
-                    )
-                    logger.info(f"Parsed {full_file_path}")
-                except StopIteration:
-                    logger.warning(
-                        f"Failed to parse {full_file_path} as an EPICS database"
-                    )
-
-    return epics_databases
-
-
-def find_epics_subs(search_path: Path) -> dict[str, dict[str, list[dict[str, str]]]]:
-    epics_subs: dict[str, dict[str, list[dict[str, str]]]] = {}
-    for dirpath, _, filenames in os.walk(search_path):
-        for file in filenames:
-            full_file_path = os.path.join(dirpath, file)
-            if file.endswith(".substitutions"):
-                try:
-                    dbs_and_macros: list[tuple[str, dict[str, str]]] = (
-                        load_template_file(full_file_path)
-                    )
-                    epics_sub = {}
-                    logger.info(f"Parsed {full_file_path}")
-                    for db_name, macros in dbs_and_macros:
-                        epics_sub.setdefault(db_name, []).append(macros)
-                    epics_subs[os.path.splitext(file)[0]] = epics_sub
-                except Exception as e:
-                    logger.warning(
-                        f"Failed to parse {full_file_path} as an EPICS subs file: {e}"
-                    )
-
-    return epics_subs
 
 
 if __name__ == "__main__":
