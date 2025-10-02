@@ -2,6 +2,7 @@
 
 import logging
 import os
+import sys
 from argparse import ArgumentParser
 from pathlib import Path
 
@@ -9,12 +10,46 @@ from dbtoolspy import Database, load_database_file, load_template_file
 
 from . import __version__
 from .bobfile_gen import generate_bobfile_for_db, generate_bobfile_for_substitution
+from .config import EPICSDB2BOBConfig
+from .palettes import WIDGET_PALETTES
 
 __all__ = ["main"]
 
 logging.basicConfig()
 
 logger = logging.getLogger("epicsdb2bob")
+
+
+class ColorFormatter(logging.Formatter):
+    """ANSI color formatter for warnings and errors."""
+
+    COLOR_MAP = {
+        logging.DEBUG: "\033[36m",  # Cyan
+        logging.INFO: "\033[32m",  # Green
+        logging.WARNING: "\033[33;1m",  # Bright Yellow
+        logging.ERROR: "\033[31;1m",  # Bright Red
+        logging.CRITICAL: "\033[41;97m",  # White on Red bg
+    }
+    RESET = "\033[0m"
+
+    def __init__(self, fmt: str, use_color: bool = True):
+        super().__init__(fmt)
+        self.use_color = use_color
+
+    def format(self, record: logging.LogRecord) -> str:
+        base = super().format(record)
+        if self.use_color and record.levelno in self.COLOR_MAP:
+            return f"{self.COLOR_MAP[record.levelno]}{base}{self.RESET}"
+        return base
+
+
+handler = logging.StreamHandler()
+use_color = sys.stderr.isatty()
+fmt = "%(asctime)s | %(levelname)-8s | %(message)s"
+handler.setFormatter(ColorFormatter(fmt, use_color=use_color))
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+logger.propagate = False
 
 
 def main() -> None:
@@ -25,6 +60,18 @@ def main() -> None:
         "--version",
         action="version",
         version=__version__,
+    )
+
+    parser.add_argument(
+        "input",
+        type=str,
+        help="Path to location in which to search for EPICS database template files",
+    )
+    parser.add_argument(
+        "output", type=str, help="Output location for generated screens."
+    )
+    parser.add_argument(
+        "-d", "--debug", action="store_true", help="Enable debug logging"
     )
     parser.add_argument(
         "-e",
@@ -42,20 +89,8 @@ def main() -> None:
         help="Macros to apply when loading databases",
     )
     parser.add_argument(
-        "input",
-        type=str,
-        help="Path to location in which to search for EPICS database template files",
-    )
-    parser.add_argument(
-        "output", type=str, help="Output location for generated screens."
-    )
-    parser.add_argument(
-        "-d", "--debug", action="store_true", help="Enable debug logging"
-    )
-
-    parser.add_argument(
         "-t",
-        "--title_bar",
+        "--title_bar_format",
         type=str,
         choices=["none", "minimal", "full"],
         default="minimal",
@@ -70,11 +105,18 @@ def main() -> None:
     )
     parser.add_argument(
         "-b",
-        "--addtl_bobfile_dirs",
+        "--bobfile_search_path",
         type=str,
         nargs="+",
         default=[],
         help="Dirs to search for addtl .bob files for generating substitution screens.",
+    )
+    parser.add_argument(
+        "--builtin_palette",
+        type=str,
+        default="default",
+        choices=WIDGET_PALETTES.keys(),
+        help="Color palette to use.",
     )
 
     args = parser.parse_args()
@@ -83,24 +125,25 @@ def main() -> None:
     if args.debug:
         logger.setLevel(logging.DEBUG)
 
-    macros_dict = {}
-    if args.macros:
-        split_macros = [macro.split("=") for macro in args.macros]
-        for macro in split_macros:
-            macros_dict[macro[0]] = macro[1]
+    if os.path.exists(".epicsdb2bob.yml"):
+        config: EPICSDB2BOBConfig = EPICSDB2BOBConfig.from_yaml(
+            Path(".epicsdb2bob.yml"), vars(args)
+        )
+        if config.debug:
+            logger.setLevel(logging.DEBUG)
+        logger.debug("Loaded configuration from .epicsdb2bob.yml")
+    else:
+        config = EPICSDB2BOBConfig()
+        logger.debug("No configuration file found, using defaults.")
 
     written_bobfiles = {}
-    databases = find_epics_dbs_and_templates(
-        args.input,
-        macros=macros_dict if macros_dict else None,
-    )
+    databases = find_epics_dbs_and_templates(args.input, config.macros)
     for name in databases:
-        screen = generate_bobfile_for_db(
-            name,
-            databases[name],
-            title_bar_size=args.title_bar,
-            readback_suffix=args.readback_suffix,
-        )
+        screen = generate_bobfile_for_db(name, databases[name], config)
+        if args.macro_level == "screen":
+            for macro in config.macros.items():
+                screen.macro(macro[0], macro[1])
+
         logger.info(f"Generated screen for database: {name}")
         output_filepath = os.path.join(args.output, f"{name}.bob")
         screen.write_screen(output_filepath)
@@ -116,7 +159,10 @@ def main() -> None:
     substitutions = find_epics_subs(args.input)
     for substitution in substitutions:
         screen = generate_bobfile_for_substitution(
-            substitution, substitutions[substitution], written_bobfiles, args.embed
+            substitution,
+            substitutions[substitution],
+            written_bobfiles,
+            args.embed,
         )
         logger.info(f"Generated screen for substitution: {substitution}")
         output_filepath = os.path.join(args.output, f"{substitution}.bob")
