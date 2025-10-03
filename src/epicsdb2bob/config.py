@@ -1,7 +1,7 @@
 import os
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from dataclasses import dataclass, field
 from typing import Any
 
 import yaml
@@ -50,13 +50,16 @@ DEFAULT_RTYP_TO_WIDGET_MAP: dict[str, type[Widget]] = {
     "stringin": TextUpdate,
 }
 
+
 @dataclass(frozen=False)
 class EPICSDB2BOBConfig:
     debug: bool = False
     embed: EmbedLevel = EmbedLevel.SINGLE
     macro_set_level: MacroSetLevel = MacroSetLevel.SCREEN
     title_bar_format: TitleBarFormat = TitleBarFormat.MINIMAL
-    rtyp_to_widget_map: dict[str, type[Widget]] = field(default_factory=lambda: DEFAULT_RTYP_TO_WIDGET_MAP)
+    rtyp_to_widget_map: dict[str, type[Widget]] = field(
+        default_factory=lambda: DEFAULT_RTYP_TO_WIDGET_MAP
+    )
     readback_suffix: str = "_RBV"
     bobfile_search_path: list[Path] = field(default_factory=list)
     palette: Palette = field(default_factory=lambda: WIDGET_PALETTES["default"])
@@ -65,12 +68,14 @@ class EPICSDB2BOBConfig:
     default_widget_height: int = 20
     max_screen_height: int = 1200
     widget_offset: int = 10
-    title_bar_heights: dict[TitleBarFormat, int] = field(default_factory=lambda: {
-        TitleBarFormat.NONE: 0,
-        TitleBarFormat.MINIMAL: 20,
-        TitleBarFormat.MINIMAL_CENTERED: 20,
-        TitleBarFormat.FULL: 40,
-    })
+    title_bar_heights: dict[TitleBarFormat, int] = field(
+        default_factory=lambda: {
+            TitleBarFormat.NONE: 0,
+            TitleBarFormat.MINIMAL: 20,
+            TitleBarFormat.MINIMAL_CENTERED: 20,
+            TitleBarFormat.FULL: 40,
+        }
+    )
     widget_widths: dict[type[Widget], int] = field(default_factory=lambda: {LED: 20})
     background_color: tuple[int, int, int] = (187, 187, 187)
     title_bar_color: tuple[int, int, int] = (218, 218, 218)
@@ -83,7 +88,6 @@ class EPICSDB2BOBConfig:
         data = cli_args.copy()
         with open(file_path) as f:
             data.update(yaml.safe_load(f))
-
 
         rtyp_to_widget_map = DEFAULT_RTYP_TO_WIDGET_MAP.copy()
         if "rtyp_to_widget_map" in data:
@@ -145,8 +149,8 @@ class EPICSDB2BOBConfig:
                 TitleBarFormat.FULL: data.get("title_bar_heights", {}).get("full", 40),
             },
             widget_widths={LED: data.get("widget_widths", {}).get("LED", 20)},
-            background_color=tuple(data.get("background_color", (187, 187, 187))), #type: ignore
-            title_bar_color=tuple(data.get("title_bar_color", (218, 218, 218))), #type: ignore
+            background_color=tuple(data.get("background_color", (187, 187, 187))),  # type: ignore
+            title_bar_color=tuple(data.get("title_bar_color", (218, 218, 218))),  # type: ignore
         )
 
     def __str__(self):

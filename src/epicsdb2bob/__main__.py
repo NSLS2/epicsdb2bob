@@ -6,11 +6,9 @@ import sys
 from argparse import ArgumentParser
 from pathlib import Path
 
-from dbtoolspy import Database, load_database_file, load_template_file
-
 from . import __version__
 from .bobfile_gen import generate_bobfile_for_db, generate_bobfile_for_substitution
-from .config import EPICSDB2BOBConfig, EmbedLevel, MacroSetLevel, TitleBarFormat
+from .config import EPICSDB2BOBConfig
 from .palettes import WIDGET_PALETTES
 from .parser import find_epics_dbs_and_templates, find_epics_subs
 
@@ -157,7 +155,11 @@ def main() -> None:
                     logger.info(f"Found additional bob/opi file: {full_path}")
                     written_bobfiles[filename] = full_path
 
-    macros = {macro.split("=")[0]: macro.split("=")[1] for macro in args.macros} if args.macros else {}
+    macros = (
+        {macro.split("=")[0]: macro.split("=")[1] for macro in args.macros}
+        if args.macros
+        else {}
+    )
 
     databases = find_epics_dbs_and_templates(args.input_path, macros)
     for name in databases:
@@ -166,7 +168,6 @@ def main() -> None:
         full_output_path = os.path.join(args.output_path, f"{name}.bob")
         screen.write_screen(full_output_path)
         written_bobfiles[os.path.basename(full_output_path)] = Path(full_output_path)
-
 
     substitutions = find_epics_subs(args.input_path)
 
@@ -180,7 +181,6 @@ def main() -> None:
         full_output_path = os.path.join(args.output_path, f"{substitution}.bob")
         screen.write_screen(full_output_path)
         written_bobfiles[os.path.basename(full_output_path)] = Path(full_output_path)
-
 
 
 if __name__ == "__main__":

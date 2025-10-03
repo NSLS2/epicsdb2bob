@@ -216,7 +216,12 @@ def generate_bobfile_for_db(
                         max_widgets_in_row = 3
 
                 for widget in add_widget_for_record(
-                    record, current_x_pos, current_y_pos, macros, config, readback_record=readback_record
+                    record,
+                    current_x_pos,
+                    current_y_pos,
+                    macros,
+                    config,
+                    readback_record=readback_record,
                 ):
                     logger.info(
                         f"Adding {widget.__class__.__name__} widget for {record.name}"

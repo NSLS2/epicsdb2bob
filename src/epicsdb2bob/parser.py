@@ -1,10 +1,12 @@
-from dbtoolspy import Database, load_database_file, load_template_file
 import logging
-from pathlib import Path
-from collections import OrderedDict
 import os
+from collections import OrderedDict
+from pathlib import Path
+
+from dbtoolspy import Database, load_database_file, load_template_file
 
 logger = logging.getLogger("epicsdb2bob")
+
 
 def order_dbs_by_includes(databases: dict[str, Database]) -> OrderedDict[str, Database]:
     ordered_dbs: OrderedDict[str, Database] = OrderedDict()
@@ -16,8 +18,12 @@ def order_dbs_by_includes(databases: dict[str, Database]) -> OrderedDict[str, Da
             includes = db.get_included_templates()
             if all(os.path.splitext(include)[0] in ordered_dbs for include in includes):
                 ordered_dbs[db_name] = db
-            elif not all(os.path.splitext(include)[0] in databases for include in includes):
-                logger.warning(f"Database {db_name} includes unknown templates: {includes}")
+            elif not all(
+                os.path.splitext(include)[0] in databases for include in includes
+            ):
+                logger.warning(
+                    f"Database {db_name} includes unknown templates: {includes}"
+                )
                 ordered_dbs[db_name] = db
         endlen = len(ordered_dbs)
         if start_len == endlen:
