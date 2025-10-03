@@ -24,7 +24,7 @@ repos:
         require_serial: true
 
       - id: import-contracts
-        name: Ensure import directionality
+        name: ensure import directionality
         pass_filenames: false
         language: system
         entry: lint-imports
