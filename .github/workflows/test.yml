@@ -1,6 +1,6 @@
 ---
 
-name: Unit Tests
+name: Test
 permissions:
   contents: read
 
