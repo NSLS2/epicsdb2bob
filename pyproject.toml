@@ -14,7 +14,7 @@ classifiers = [
 description = "CLI utility for auto-creating phoebus engineering screens from EPICS db templates"
 dependencies = [
     "phoebusgen",
-    "dbtoolspy@git+https://github.com/jwlodek/dbtoolspy",
+    "epics_dbtools@git+https://github.com/jwlodek/epics-dbtools",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"

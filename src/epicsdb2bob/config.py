@@ -153,6 +153,7 @@ class EPICSDB2BOBConfig:
             title_bar_color=tuple(data.get("title_bar_color", (218, 218, 218))),  # type: ignore
         )
 
+<<<<<<< Updated upstream
     def __str__(self):
         return (
             f"EPICSDB2BOBConfig(debug={self.debug}, embed={self.embed}, "
@@ -171,3 +172,39 @@ class EPICSDB2BOBConfig:
             f"background_color={self.background_color}, "
             f"title_bar_color={self.title_bar_color})"
         )
+=======
+    # def to_dict(self) -> dict[str, Any]:
+    #     return {
+    #         "debug": self.debug,
+    #         "embed": self.embed.value,
+    #         "title_bar_format": self.title_bar_format.value,
+    #         "readback_suffix": self.readback_suffix,
+    #         "bobfile_search_path": [str(p) for p in self.bobfile_search_path],
+    #         "palette": {
+    #             "foreground": {
+    #                 k.__name__: v for k, v in self.palette["foreground"].items()
+    #             },
+    #             "background": {
+    #                 k.__name__: v for k, v in self.palette["background"].items()
+    #             },
+    #         },
+    #         "rtyp_to_widget_map": {
+    #             k: v.__name__ for k, v in self.rtyp_to_widget_map.items()
+    #         },
+    #         "font_size": self.font_size,
+    #         "default_widget_width": self.default_widget_width,
+    #         "default_widget_height": self.default_widget_height,
+    #         "max_screen_height": self.max_screen_height,
+    #         "widget_offset": self.widget_offset,
+    #         "title_bar_heights": {
+    #             k.value: v for k, v in self.title_bar_heights.items()
+    #         },
+    #         "widget_widths": {k.__name__: v for k, v in self.widget_widths.items()},
+    #         "background_color": self.background_color,
+    #         "title_bar_color": self.title_bar_color,
+    #     }
+
+    # def save(self, file_path: str = ".epicsdb2bob.yml") -> None:
+    #     with open(file_path, "w") as f:
+    #         yaml.safe_dump(self.to_dict(), f, sort_keys=False)
+>>>>>>> Stashed changes
