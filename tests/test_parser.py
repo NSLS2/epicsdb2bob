@@ -1,13 +1,5 @@
-<<<<<<< Updated upstream
 from epicsdb2bob.parser import (
     order_dbs_by_includes,
-=======
-import pytest
-from epicsdb2bob.parser import (
-    order_dbs_by_includes,
-    find_epics_dbs_and_templates,
-    find_epics_subs,
->>>>>>> Stashed changes
 )
 
 

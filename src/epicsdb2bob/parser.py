@@ -3,7 +3,12 @@ import os
 from collections import OrderedDict
 from pathlib import Path
 
-from epicsdbtools import Database, load_database_file, load_template_file, LoadIncludesStrategy
+from epicsdbtools import (
+    Database,
+    LoadIncludesStrategy,
+    load_database_file,
+    load_template_file,
+)
 
 logger = logging.getLogger("epicsdb2bob")
 
@@ -41,7 +46,9 @@ def find_epics_dbs_and_templates(
             if file.endswith((".db", ".template")):
                 try:
                     epics_databases[file.split(".", -1)[0]] = load_database_file(
-                        full_file_path, macros=macros, load_includes_strategy=LoadIncludesStrategy.IGNORE
+                        full_file_path,
+                        macros=macros,
+                        load_includes_strategy=LoadIncludesStrategy.IGNORE,
                     )
                     logger.info(f"Parsed {full_file_path}")
                 except StopIteration:

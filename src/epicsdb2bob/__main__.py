@@ -39,12 +39,21 @@ class ColorFormatter(logging.Formatter):
         if self.use_color and record.levelno in self.COLOR_MAP:
             # Temporarily modify the levelname with color codes
             original_levelname = record.levelname
-            record.levelname = f"{self.COLOR_MAP[record.levelno]}{original_levelname}{self.RESET}"
+            # Pad to 8 characters (length of "CRITICAL") for consistent alignment
+            padded_levelname = original_levelname.ljust(8)
+            record.levelname = (
+                f"{self.COLOR_MAP[record.levelno]}{padded_levelname}{self.RESET}"
+            )
             base = super().format(record)
             # Restore the original levelname
             record.levelname = original_levelname
             return base
-        return super().format(record)
+        # For non-colored output, still pad for consistency
+        original_levelname = record.levelname
+        record.levelname = original_levelname.ljust(8)
+        base = super().format(record)
+        record.levelname = original_levelname
+        return base
 
 
 handler = logging.StreamHandler()
@@ -131,6 +140,7 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+    logger.info(f"epicsdb2bob version {__version__}")
 
     logger.setLevel(logging.INFO)
     if args.debug:
@@ -142,6 +152,9 @@ def main() -> None:
         )
         if config.debug:
             logger.setLevel(logging.DEBUG)
+            import epicsdbtools.log.logger as epicsdbtools_logger
+
+            epicsdbtools_logger.setLevel(logging.DEBUG)
         logger.debug("Loaded configuration from .epicsdb2bob.yml")
     else:
         config = EPICSDB2BOBConfig()
