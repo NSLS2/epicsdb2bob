@@ -36,10 +36,15 @@ class ColorFormatter(logging.Formatter):
         self.use_color = use_color
 
     def format(self, record: logging.LogRecord) -> str:
-        base = super().format(record)
         if self.use_color and record.levelno in self.COLOR_MAP:
-            return f"{self.COLOR_MAP[record.levelno]}{base}{self.RESET}"
-        return base
+            # Temporarily modify the levelname with color codes
+            original_levelname = record.levelname
+            record.levelname = f"{self.COLOR_MAP[record.levelno]}{original_levelname}{self.RESET}"
+            base = super().format(record)
+            # Restore the original levelname
+            record.levelname = original_levelname
+            return base
+        return super().format(record)
 
 
 handler = logging.StreamHandler()
