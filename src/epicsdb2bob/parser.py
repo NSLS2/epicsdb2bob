@@ -47,7 +47,6 @@ def find_epics_dbs_and_templates(
                 try:
                     epics_databases[file.split(".", -1)[0]] = load_database_file(
                         full_file_path,
-                        macros=macros,
                         load_includes_strategy=LoadIncludesStrategy.IGNORE,
                     )
                     logger.info(f"Parsed {full_file_path}")
