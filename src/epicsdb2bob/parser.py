@@ -3,7 +3,7 @@ import os
 from collections import OrderedDict
 from pathlib import Path
 
-from dbtoolspy import Database, load_database_file, load_template_file
+from epicsdbtools import Database, load_database_file, load_template_file
 
 logger = logging.getLogger("epicsdb2bob")
 
@@ -37,7 +37,7 @@ def find_epics_dbs_and_templates(
     epics_databases: dict[str, Database] = {}
     for dirpath, _, filenames in os.walk(search_path):
         for file in filenames:
-            full_file_path = os.path.join(dirpath, file)
+            full_file_path = Path(dirpath) / file
             if file.endswith((".db", ".template")):
                 try:
                     epics_databases[file.split(".", -1)[0]] = load_database_file(
@@ -58,7 +58,7 @@ def find_epics_subs(search_path: Path) -> dict[str, dict[str, list[dict[str, str
     epics_subs: dict[str, dict[str, list[dict[str, str]]]] = {}
     for dirpath, _, filenames in os.walk(search_path):
         for file in filenames:
-            full_file_path = os.path.join(dirpath, file)
+            full_file_path = Path(dirpath) / file
             if file.endswith(".substitutions"):
                 try:
                     dbs_and_macros: list[tuple[str, dict[str, str]]] = (
