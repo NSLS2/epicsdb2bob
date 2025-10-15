@@ -58,7 +58,7 @@ class ColorFormatter(logging.Formatter):
 
 handler = logging.StreamHandler()
 use_color = sys.stderr.isatty()
-fmt = "%(asctime)s | %(levelname)-8s | %(message)s"
+fmt = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
 handler.setFormatter(ColorFormatter(fmt, use_color=use_color))
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
