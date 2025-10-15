@@ -2,3 +2,4 @@ venv/
 *.egg*
 *.pyc
 *.bob
+_version.py

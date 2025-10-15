@@ -5,7 +5,7 @@ from typing import Any
 from uuid import uuid4
 from xml.etree import ElementTree as ET
 
-from dbtoolspy import Database, Record
+from epicsdbtools import Database, Record
 from phoebusgen.screen import Screen
 from phoebusgen.widget import (
     ActionButton,
