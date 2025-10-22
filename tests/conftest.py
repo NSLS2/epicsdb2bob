@@ -1,7 +1,7 @@
 from collections.abc import Callable
 
 import pytest
-from dbtoolspy import Database, Record
+from epicsdbtools import Database, Record
 
 from epicsdb2bob.config import DEFAULT_RTYP_TO_WIDGET_MAP
 
@@ -72,5 +72,5 @@ def db_with_readbacks(simple_db, readback_record_factory) -> Database:
 def compound_db(simple_db_factory, db_with_readbacks) -> tuple[Database, Database]:
     db = simple_db_factory("simple")
     compound_db = simple_db_factory("compound")
-    compound_db.add_included_template("simple.template")
+    compound_db.add_included_template("simple.template", database=None)
     return db, compound_db
