@@ -302,8 +302,8 @@ def get_height_width_of_bobfile(
     with open(bobfile_path) as bobfile:
         xml = ET.parse(bobfile)
 
-        height = int(xml.getroot().find("height").text) + config.widget_offsetoffset  # type: ignore
-        width = int(xml.getroot().find("width").text) + config.widget_offsetoffset  # type: ignore
+        height = int(xml.getroot().find("height").text) + config.widget_offset  # type: ignore
+        width = int(xml.getroot().find("width").text) + config.widget_offset  # type: ignore
         return height, width
 
 
