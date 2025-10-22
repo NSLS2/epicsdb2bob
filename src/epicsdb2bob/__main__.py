@@ -194,7 +194,7 @@ def main() -> None:
             substitution,
             substitutions[substitution],
             written_bobfiles,
-            args.embed,
+            config,
         )
         full_output_path = os.path.join(args.output_path, f"{substitution}.bob")
         screen.write_screen(full_output_path)
