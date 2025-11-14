@@ -9,7 +9,7 @@ from phoebusgen import widget as phoebusgen_widget
 from phoebusgen.widget import LED, ChoiceButton, ComboBox, TextEntry, TextUpdate
 from phoebusgen.widget.widget import _Widget as Widget
 
-from .palettes import WIDGET_PALETTES, Palette
+from .palettes import BUILTIN_PALETTES, Palette
 
 
 class EmbedLevel(str, Enum):
@@ -27,8 +27,23 @@ class TitleBarFormat(str, Enum):
 
     NONE = "none"  # No title bar
     MINIMAL = "minimal"  # Minimal title bar
-    MINIMAL_CENTERED = "minimal_centered"  # Minimal title bar, but centered
     FULL = "full"  # Full title bar
+
+
+class HorizontalAlignment(str, Enum):
+    """Determines the alignment of title bar text."""
+
+    LEFT = "left"  # Left aligned
+    CENTER = "center"  # Centered
+    RIGHT = "right"  # Right aligned
+
+
+class VerticalAlignment(str, Enum):
+    """Determines the vertical alignment of title bar text."""
+
+    TOP = "top"  # Top aligned
+    MIDDLE = "middle"  # Centered
+    BOTTOM = "bottom"  # Bottom aligned
 
 
 class MacroSetLevel(str, Enum):
@@ -46,6 +61,8 @@ DEFAULT_RTYP_TO_WIDGET_MAP: dict[str, type[Widget]] = {
     "bi": LED,
     "ao": TextEntry,
     "ai": TextUpdate,
+    "longout": TextEntry,
+    "longin": TextUpdate,
     "stringout": TextEntry,
     "stringin": TextUpdate,
 }
@@ -62,7 +79,7 @@ class EPICSDB2BOBConfig:
     )
     readback_suffix: str = "_RBV"
     bobfile_search_path: list[Path] = field(default_factory=list)
-    palette: Palette = field(default_factory=lambda: WIDGET_PALETTES["default"])
+    palette: Palette = field(default_factory=lambda: BUILTIN_PALETTES["default"])
     font_size: int = 16
     default_widget_width: int = 150
     default_widget_height: int = 20
@@ -72,10 +89,10 @@ class EPICSDB2BOBConfig:
         default_factory=lambda: {
             TitleBarFormat.NONE: 0,
             TitleBarFormat.MINIMAL: 20,
-            TitleBarFormat.MINIMAL_CENTERED: 20,
             TitleBarFormat.FULL: 40,
         }
     )
+    label_alignment: HorizontalAlignment = HorizontalAlignment.LEFT
     widget_widths: dict[type[Widget], int] = field(default_factory=lambda: {LED: 20})
     background_color: tuple[int, int, int] = (187, 187, 187)
     title_bar_color: tuple[int, int, int] = (218, 218, 218)
@@ -104,26 +121,18 @@ class EPICSDB2BOBConfig:
                 ]
 
         # Get base builtin palette if set
-        palette = WIDGET_PALETTES["default"]
-        if "builtin_palette" in data and data["builtin_palette"] not in WIDGET_PALETTES:
+        palette = BUILTIN_PALETTES["default"]
+        if "palette" in data and data["palette"] not in BUILTIN_PALETTES:
             raise ValueError(
-                f"Builtin palette {data['builtin_palette']} is not recognized."
-                f"Valid options are: {list(WIDGET_PALETTES.keys())}"
+                f"Builtin palette {data['palette']} is not recognized."
+                f"Valid options are: {list(BUILTIN_PALETTES.keys())}."
             )
-        elif "builtin_palette" in data:
-            palette = WIDGET_PALETTES[data["builtin_palette"]]
+        elif "palette" in data:
+            palette = BUILTIN_PALETTES[data["palette"]]
 
         # Override with any custom palette settings
-        custom_palette = {"foreground": {}, "background": {}}
         if "custom_palette" in data:
-            for key in ["foreground", "background"]:
-                for widget_type in data["custom_palette"][key]:
-                    custom_palette[key][getattr(phoebusgen_widget, widget_type)] = data[
-                        "custom_palette"
-                    ][key][widget_type]
-
-        palette["foreground"].update(custom_palette["foreground"])
-        palette["background"].update(custom_palette["background"])
+            palette.update_from_dict(data["custom_palette"])
 
         return EPICSDB2BOBConfig(
             debug=data.get("debug", False),
@@ -143,15 +152,41 @@ class EPICSDB2BOBConfig:
                 TitleBarFormat.MINIMAL: data.get("title_bar_heights", {}).get(
                     "minimal", 20
                 ),
-                TitleBarFormat.MINIMAL_CENTERED: data.get("title_bar_heights", {}).get(
-                    "minimal_centered", 20
-                ),
                 TitleBarFormat.FULL: data.get("title_bar_heights", {}).get("full", 40),
             },
             widget_widths={LED: data.get("widget_widths", {}).get("LED", 20)},
             background_color=tuple(data.get("background_color", (187, 187, 187))),  # type: ignore
             title_bar_color=tuple(data.get("title_bar_color", (218, 218, 218))),  # type: ignore
         )
+
+    def to_yaml(self, file_path: Path) -> None:
+        data = {
+            "debug": self.debug,
+            "embed": self.embed.value,
+            "macro_set_level": self.macro_set_level.value,
+            "title_bar_format": self.title_bar_format.value,
+            "readback_suffix": self.readback_suffix,
+            "bobfile_search_path": [str(p) for p in self.bobfile_search_path],
+            "palette": next(
+                (name for name, pal in BUILTIN_PALETTES.items() if pal == self.palette),
+            ),
+            "rtyp_to_widget_map": {
+                key: value.__name__ for key, value in self.rtyp_to_widget_map.items()
+            },
+            "font_size": self.font_size,
+            "default_widget_width": self.default_widget_width,
+            "default_widget_height": self.default_widget_height,
+            "max_screen_height": self.max_screen_height,
+            "widget_offset": self.widget_offset,
+            "title_bar_heights": {
+                key.value: value for key, value in self.title_bar_heights.items()
+            },
+            "widget_widths": {
+                key.__name__: value for key, value in self.widget_widths.items()
+            },
+        }
+        with open(file_path, "w") as f:
+            yaml.dump(data, f, sort_keys=False)
 
     def __str__(self):
         return (
@@ -168,6 +203,4 @@ class EPICSDB2BOBConfig:
             f"widget_offset={self.widget_offset}, "
             f"title_bar_heights={self.title_bar_heights}, "
             f"widget_widths={self.widget_widths}, "
-            f"background_color={self.background_color}, "
-            f"title_bar_color={self.title_bar_color})"
         )

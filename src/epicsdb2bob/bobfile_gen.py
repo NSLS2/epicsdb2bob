@@ -22,10 +22,19 @@ from phoebusgen.widget.properties import (
 from phoebusgen.widget.properties import (
     _ForegroundColor as HasForegroundColor,
 )
+from phoebusgen.widget.properties import (
+    _HorizontalAlignment as HasHorizontalAlignment,
+)
 from phoebusgen.widget.widget import _Widget as Widget
 
-from .config import EmbedLevel, EPICSDB2BOBConfig, MacroSetLevel, TitleBarFormat
-from .palettes import BACKGROUND_COLOR, BLACK, WHITE
+from .config import (
+    EmbedLevel,
+    EPICSDB2BOBConfig,
+    HorizontalAlignment,
+    MacroSetLevel,
+    TitleBarFormat,
+)
+from .palettes import BLACK, WHITE
 
 logger = logging.getLogger("epicsdb2bob")
 
@@ -44,6 +53,17 @@ def template_to_bob(template: str) -> str:
     return os.path.splitext(os.path.basename(template))[0] + ".bob"
 
 
+def align_widget_horizontally(
+    widget: HasHorizontalAlignment, alignment: HorizontalAlignment
+) -> None:
+    if alignment == HorizontalAlignment.LEFT:
+        widget.horizontal_alignment_left()
+    elif alignment == HorizontalAlignment.CENTER:
+        widget.horizontal_alignment_center()
+    elif alignment == HorizontalAlignment.RIGHT:
+        widget.horizontal_alignment_right()
+
+
 def add_label_for_record(
     record: Record, start_x: int, start_y: int, config: EPICSDB2BOBConfig
 ) -> Label:
@@ -57,9 +77,10 @@ def add_label_for_record(
         config.default_widget_height,
     )
 
-    label.foreground_color(*config.palette["foreground"].get(Label, BLACK))
-    label.background_color(*config.palette["background"].get(Label, BACKGROUND_COLOR))
+    label.foreground_color(*config.palette.get_widget_fg(Label))
+    label.background_color(*config.palette.get_widget_bg(Label))
     label.font_size(config.font_size)
+    align_widget_horizontally(label, config.label_alignment)
 
     return label
 
@@ -100,12 +121,10 @@ def add_widget_for_record(
     )
 
     if isinstance(widget, HasForegroundColor):
-        widget.foreground_color(*config.palette["foreground"].get(widget_type, BLACK))
+        widget.foreground_color(*config.palette.get_widget_fg(widget_type))
 
     if isinstance(widget, HasBackgroundColor):
-        widget.background_color(
-            *config.palette["background"].get(widget_type, BACKGROUND_COLOR)
-        )
+        widget.background_color(*config.palette.get_widget_bg(widget_type))
 
     if isinstance(widget, HasFontSize):
         widget.font_size(config.font_size)
@@ -132,10 +151,10 @@ def add_widget_for_record(
 
 
 def add_title_bar(
-    name: str, screen: Screen, config: EPICSDB2BOBConfig, title_bar_width: int
-) -> None:
+    name: str, config: EPICSDB2BOBConfig, title_bar_width: int
+) -> Label | None:
     if config.title_bar_format == TitleBarFormat.NONE:
-        return
+        return None
 
     title_bar = Label(
         short_uuid(),
@@ -151,22 +170,23 @@ def add_title_bar(
     if config.title_bar_format == TitleBarFormat.FULL:
         title_bar.font_size(config.font_size * 2)
         title_bar.horizontal_alignment_center()
-    elif config.title_bar_format in [
-        TitleBarFormat.MINIMAL,
-        TitleBarFormat.MINIMAL_CENTERED,
-    ]:
+    elif config.title_bar_format == TitleBarFormat.MINIMAL:
         title_bar.auto_size()
         title_bar.font_size(config.font_size + 2)
         title_bar.border_width(2)
         title_bar.border_color(*BLACK)
 
-    title_bar.background_color(*config.title_bar_color)
+    title_bar.background_color(*config.palette.title_bar_bg)
+    title_bar.foreground_color(*config.palette.title_bar_fg)
     title_bar.transparent(False)
     title_bar.vertical_alignment_middle()
-    screen.add_widget(title_bar)
+    return title_bar
 
 
-def add_border(screen: Screen, config: EPICSDB2BOBConfig) -> Rectangle:
+def add_border(config: EPICSDB2BOBConfig) -> Rectangle | None:
+    if config.title_bar_format != TitleBarFormat.MINIMAL:
+        return None
+
     border = Rectangle(
         short_uuid(),
         0,
@@ -177,10 +197,53 @@ def add_border(screen: Screen, config: EPICSDB2BOBConfig) -> Rectangle:
     border.transparent(True)
     border.line_width(2)
     border.line_color(*BLACK)
-    if config.title_bar_format == TitleBarFormat.MINIMAL:
-        screen.add_widget(border)
 
     return border
+
+
+def get_widget_start_positions(config: EPICSDB2BOBConfig) -> tuple[int, int]:
+    start_x_pos = config.widget_offset
+    start_y_pos = (
+        config.widget_offset + config.title_bar_heights[config.title_bar_format]
+    )
+    return start_x_pos, start_y_pos
+
+
+def get_next_x_position(
+    current_x: int, col_width_widgets: int, config: EPICSDB2BOBConfig
+) -> int:
+    return current_x + col_width_widgets * (
+        config.default_widget_width + config.widget_offset
+    )
+
+
+def get_next_widget_position(
+    current_x, current_y: int, col_width_widgets: int, config: EPICSDB2BOBConfig
+) -> tuple[int, int]:
+    new_x = current_x
+    new_y = current_y + config.default_widget_height + config.widget_offset
+
+    # Reset to next column if we hit max height
+    if (
+        new_y
+        > config.max_screen_height - config.title_bar_heights[config.title_bar_format]
+    ):
+        _, new_y = get_widget_start_positions(config)
+        new_x = get_next_x_position(current_x, col_width_widgets, config)
+
+    return new_x, new_y
+
+
+def add_dividing_line(
+    x_position: int,
+    y_position: int,
+    config: EPICSDB2BOBConfig,
+) -> Rectangle:
+    dividing_line = Rectangle(
+        short_uuid(), x_position, y_position, 2, config.max_screen_height - y_position
+    )
+    dividing_line.line_color(*BLACK)
+    return dividing_line
 
 
 def generate_bobfile_for_db(
@@ -188,14 +251,15 @@ def generate_bobfile_for_db(
 ) -> Screen:
     screen = Screen(name)
 
-    current_x_pos = config.widget_offset
-    current_y_pos = (
-        2 * config.widget_offset + config.title_bar_heights[config.title_bar_format]
-    )
-    hit_max_y_pos = False
-    max_widgets_in_row = 2
+    start_x_pos, start_y_pos = get_widget_start_positions(config)
+    current_x_pos = start_x_pos
+    current_y_pos = start_y_pos
 
-    border = add_border(screen, config)
+    col_width_widgets = 2
+
+    border = add_border(config)
+    if border:
+        screen.add_widget(border)
 
     records_seen = []
 
@@ -213,16 +277,19 @@ def generate_bobfile_for_db(
                     if rb.rtyp in config.rtyp_to_widget_map:
                         readback_record = rb
                         logger.info(f"Found readback record: {rb.name}")
-                        max_widgets_in_row = 3
 
-                for widget in add_widget_for_record(
+                widgets_for_record = add_widget_for_record(
                     record,
                     current_x_pos,
                     current_y_pos,
                     macros,
                     config,
                     readback_record=readback_record,
-                ):
+                )
+
+                col_width_widgets = max(len(widgets_for_record), col_width_widgets)
+
+                for widget in widgets_for_record:
                     logger.info(
                         f"Adding {widget.__class__.__name__} widget for {record.name}"
                     )
@@ -233,50 +300,28 @@ def generate_bobfile_for_db(
                 if readback_record:
                     records_seen.append(readback_record.name)
 
-                current_y_pos += config.default_widget_height + config.widget_offset
-                if (
-                    current_y_pos
-                    > config.max_screen_height
-                    - config.title_bar_heights[config.title_bar_format]
-                ):
-                    hit_max_y_pos = True
-                    dividing_line = Rectangle(
-                        short_uuid(),
-                        current_x_pos
-                        + max_widgets_in_row
-                        * (config.default_widget_width + config.widget_offset),
-                        config.widget_offset
-                        + config.title_bar_heights[config.title_bar_format],
-                        2,
-                        config.max_screen_height
-                        - config.title_bar_heights[config.title_bar_format]
-                        - config.widget_offset,
+                current_x_pos, current_y_pos = get_next_widget_position(
+                    current_x_pos, current_y_pos, col_width_widgets, config
+                )
+                if current_y_pos == start_y_pos:
+                    dividing_line = add_dividing_line(
+                        current_x_pos - config.widget_offset, current_y_pos, config
                     )
-                    dividing_line.line_color(*BLACK)
                     screen.add_widget(dividing_line)
+                    col_width_widgets = 2
 
-                    current_y_pos = (
-                        2 * config.widget_offset
-                        + config.title_bar_heights[config.title_bar_format]
-                    )
-                    current_x_pos += (
-                        max_widgets_in_row
-                        * (config.default_widget_width + config.widget_offset)
-                        + config.widget_offset
-                    )
-                    max_widgets_in_row = 2
+    screen_width = get_next_x_position(current_x_pos, col_width_widgets, config)
 
-    screen_width = current_x_pos + max_widgets_in_row * (
-        config.default_widget_width + config.widget_offset
-    )
-    if hit_max_y_pos:
+    if current_x_pos != start_x_pos:
         screen_height = config.max_screen_height + config.widget_offset
     else:
         screen_height = current_y_pos + config.widget_offset
 
-    add_title_bar(name, screen, config, screen_width - config.widget_offset)
+    title_bar = add_title_bar(name, config, screen_width - config.widget_offset)
+    if title_bar:
+        screen.add_widget(title_bar)
 
-    if config.title_bar_format == TitleBarFormat.MINIMAL:
+    if config.title_bar_format == TitleBarFormat.MINIMAL and border is not None:
         border.width(screen_width)
         border.height(
             screen_height - int(config.title_bar_heights[config.title_bar_format] / 2)
@@ -296,14 +341,12 @@ def generate_bobfile_for_db(
     return screen
 
 
-def get_height_width_of_bobfile(
-    bobfile_path: str | Path, config: EPICSDB2BOBConfig
-) -> tuple[int, int]:
+def get_height_width_of_bobfile(bobfile_path: str | Path) -> tuple[int, int]:
     with open(bobfile_path) as bobfile:
         xml = ET.parse(bobfile)
 
-        height = int(xml.getroot().find("height").text) + config.widget_offset  # type: ignore
-        width = int(xml.getroot().find("width").text) + config.widget_offset  # type: ignore
+        height = int(xml.getroot().find("height").text)  # type: ignore
+        width = int(xml.getroot().find("width").text)  # type: ignore
         return height, width
 
 
@@ -341,9 +384,11 @@ def generate_bobfile_for_substitution(
                 or (config.embed == EmbedLevel.SINGLE and len(template_instances) == 1)
             ):
                 logger.info(f"Embedding display for instance: {instance}")
-                embed_height, embed_width = get_height_width_of_bobfile(
-                    found_bobfiles[template_to_bob(template)], config
+                embed_raw_height, embed_raw_width = get_height_width_of_bobfile(
+                    found_bobfiles[template_to_bob(template)]
                 )
+                embed_height = embed_raw_height + config.widget_offset
+                embed_width = embed_raw_width + config.widget_offset
                 if (
                     current_y_pos + embed_height
                     > config.max_screen_height
@@ -420,12 +465,13 @@ def generate_bobfile_for_substitution(
         screen_height = config.max_screen_height + config.widget_offset
     screen_width = current_x_pos + max_col_width + config.widget_offset
 
-    add_title_bar(
+    title_bar = add_title_bar(
         substitution_name,
-        screen,
         config,
         screen_width - config.widget_offset,
     )
+    if title_bar:
+        screen.add_widget(title_bar)
 
     screen.height(screen_height)
     screen.width(screen_width)

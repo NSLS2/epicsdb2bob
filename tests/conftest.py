@@ -3,9 +3,7 @@ from collections.abc import Callable
 import pytest
 from epicsdbtools import Database, Record
 
-from epicsdb2bob.config import DEFAULT_RTYP_TO_WIDGET_MAP
-
-RTYP_IN_DEFAULT_MAP = set(DEFAULT_RTYP_TO_WIDGET_MAP.keys())
+from epicsdb2bob.config import DEFAULT_RTYP_TO_WIDGET_MAP, EPICSDB2BOBConfig
 
 
 @pytest.fixture
@@ -15,7 +13,7 @@ def simple_record_factory() -> Callable[[str, str], Record]:
         record.rtyp = rtyp  # type: ignore
         record.name = name  # type: ignore
         record.fields = {  # type: ignore
-            "DESC": f"Test: {name}",
+            "DESC": f"{name.upper()} desc",
         }
         return record
 
@@ -28,12 +26,12 @@ def readback_record_factory() -> Callable[[Record], Record]:
         if out_record.rtyp.endswith("o"):  # type: ignore
             rtyp = out_record.rtyp[:-1] + "i"  # type: ignore
         else:
-            rtyp = out_record.rtyp + "in"  # type: ignore
+            rtyp = out_record.rtyp[:-3] + "in"  # type: ignore
         record = Record()
         record.rtyp = rtyp  # type: ignore
         record.name = out_record.name + "_RBV"  # type: ignore
         record.fields = {  # type: ignore
-            "DESC": f"Test: {out_record.name} RB",
+            "DESC": f"{out_record.name.upper()} RB desc",  # type: ignore
         }
         return record
 
@@ -44,7 +42,7 @@ def readback_record_factory() -> Callable[[Record], Record]:
 def simple_db_factory(simple_record_factory) -> Callable[[str], Database]:
     def _db_factory(name: str) -> Database:
         db = Database()
-        for rtyp in RTYP_IN_DEFAULT_MAP:
+        for rtyp in DEFAULT_RTYP_TO_WIDGET_MAP.keys():
             for i in range(2):
                 record = simple_record_factory(rtyp, f"{name}_{rtyp}_{i + 1}")
                 db.add_record(record)
@@ -74,3 +72,8 @@ def compound_db(simple_db_factory, db_with_readbacks) -> tuple[Database, Databas
     compound_db = simple_db_factory("compound")
     compound_db.add_included_template("simple.template", database=None)
     return db, compound_db
+
+
+@pytest.fixture
+def default_config() -> EPICSDB2BOBConfig:
+    return EPICSDB2BOBConfig()

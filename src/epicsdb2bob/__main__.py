@@ -9,7 +9,7 @@ from pathlib import Path
 from . import __version__
 from .bobfile_gen import generate_bobfile_for_db, generate_bobfile_for_substitution
 from .config import EPICSDB2BOBConfig
-from .palettes import WIDGET_PALETTES
+from .palettes import BUILTIN_PALETTES
 from .parser import find_epics_dbs_and_templates, find_epics_subs
 
 __all__ = ["main"]
@@ -125,10 +125,10 @@ def main() -> None:
         help="Dirs to search for addtl .bob files for generating substitution screens.",
     )
     parser.add_argument(
-        "--builtin_palette",
+        "--palette",
         type=str,
         default="default",
-        choices=WIDGET_PALETTES.keys(),
+        choices=BUILTIN_PALETTES.keys(),
         help="Color palette to use.",
     )
     parser.add_argument(
@@ -150,6 +150,7 @@ def main() -> None:
         config: EPICSDB2BOBConfig = EPICSDB2BOBConfig.from_yaml(
             Path(".epicsdb2bob.yml"), vars(args)
         )
+
         if config.debug:
             logger.setLevel(logging.DEBUG)
             import epicsdbtools.log.logger as epicsdbtools_logger
