@@ -48,17 +48,6 @@ class Palette:
         self.widget_fg.update(other.widget_fg)
         self.widget_bg.update(other.widget_bg)
 
-    def validate(self) -> bool:
-        if not self.screen_bg:
-            return False
-        if not self.border_color:
-            return False
-        if not self.title_bar_bg:
-            return False
-        if not self.title_bar_fg:
-            return False
-        return True
-
     def update_from_dict(self, source: dict[str, Any]) -> None:
         if "screen_bg" in source:
             self.screen_bg = tuple(source["screen_bg"])
