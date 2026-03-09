@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import Enum, StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -12,7 +12,7 @@ from phoebusgen.widget.widget import _Widget as Widget
 from .palettes import BUILTIN_PALETTES, Palette
 
 
-class EmbedLevel(str, Enum):
+class EmbedLevel(StrEnum):
     """Determines whether multiple screens should be combined via embedding."""
 
     NONE = (
@@ -22,7 +22,7 @@ class EmbedLevel(str, Enum):
     ALL = "all"  # Embed all subscreens, even if there are multiple instances of each
 
 
-class TitleBarFormat(str, Enum):
+class TitleBarFormat(StrEnum):
     """Determines the format of the title bar."""
 
     NONE = "none"  # No title bar
@@ -38,7 +38,7 @@ class HorizontalAlignment(int, Enum):
     RIGHT = 2  # Right aligned
 
 
-class MacroSetLevel(str, Enum):
+class MacroSetLevel(StrEnum):
     """Determines at what level macros should be set."""
 
     NONE = "none"  # No macros
@@ -46,7 +46,7 @@ class MacroSetLevel(str, Enum):
     WIDGET = "widget"  # Set macros at the widget level
 
 
-DEFAULT_RTYP_TO_WIDGET_MAP: dict[str, type[Widget]] = {
+DEFAULT_RTYPE_TO_WIDGET_MAP: dict[str, type[Widget]] = {
     "mbbo": ComboBox,
     "mbbi": TextUpdate,
     "bo": ChoiceButton,
@@ -66,8 +66,8 @@ class EPICSDB2BOBConfig:
     embed: EmbedLevel = EmbedLevel.SINGLE
     macro_set_level: MacroSetLevel = MacroSetLevel.SCREEN
     title_bar_format: TitleBarFormat = TitleBarFormat.MINIMAL
-    rtyp_to_widget_map: dict[str, type[Widget]] = field(
-        default_factory=lambda: DEFAULT_RTYP_TO_WIDGET_MAP
+    rtype_to_widget_map: dict[str, type[Widget]] = field(
+        default_factory=lambda: DEFAULT_RTYPE_TO_WIDGET_MAP
     )
     readback_suffix: str = "_RBV"
     bobfile_search_path: list[Path] = field(default_factory=list)
@@ -98,11 +98,11 @@ class EPICSDB2BOBConfig:
         with open(file_path) as f:
             data.update(yaml.safe_load(f))
 
-        rtyp_to_widget_map = DEFAULT_RTYP_TO_WIDGET_MAP.copy()
-        if "rtyp_to_widget_map" in data:
-            for key in data["rtyp_to_widget_map"]:
-                rtyp_to_widget_map[key] = getattr(
-                    phoebusgen_widget, data["rtyp_to_widget_map"][key]
+        rtype_to_widget_map = DEFAULT_RTYPE_TO_WIDGET_MAP.copy()
+        if "rtype_to_widget_map" in data:
+            for key in data["rtype_to_widget_map"]:
+                rtype_to_widget_map[key] = getattr(
+                    phoebusgen_widget, data["rtype_to_widget_map"][key]
                 )
 
         widget_widths = {LED: 20}
@@ -133,7 +133,7 @@ class EPICSDB2BOBConfig:
             readback_suffix=data.get("readback_suffix", "_RBV"),
             bobfile_search_path=[Path(p) for p in data.get("bobfile_search_path", [])],
             palette=palette,
-            rtyp_to_widget_map=rtyp_to_widget_map,
+            rtype_to_widget_map=rtype_to_widget_map,
             font_size=data.get("font_size", 16),
             default_widget_width=data.get("default_widget_width", 150),
             default_widget_height=data.get("default_widget_height", 20),
@@ -162,8 +162,8 @@ class EPICSDB2BOBConfig:
             "palette": next(
                 (name for name, pal in BUILTIN_PALETTES.items() if pal == self.palette),
             ),
-            "rtyp_to_widget_map": {
-                key: value.__name__ for key, value in self.rtyp_to_widget_map.items()
+            "rtype_to_widget_map": {
+                key: value.__name__ for key, value in self.rtype_to_widget_map.items()
             },
             "font_size": self.font_size,
             "default_widget_width": self.default_widget_width,
@@ -185,7 +185,7 @@ class EPICSDB2BOBConfig:
             f"EPICSDB2BOBConfig(debug={self.debug}, embed={self.embed}, "
             f"macro_set_level={self.macro_set_level}, "
             f"title_bar_format={self.title_bar_format}, "
-            f"rtyp_to_widget_map={self.rtyp_to_widget_map}, "
+            f"rtype_to_widget_map={self.rtype_to_widget_map}, "
             f"readback_suffix={self.readback_suffix}, "
             f"bobfile_search_path={self.bobfile_search_path}, "
             f"palette={self.palette}, font_size={self.font_size}, "

@@ -95,7 +95,7 @@ def add_widget_for_record(
     readback_record: Record | None = None,
     with_label: bool = True,
 ) -> list[Widget]:
-    widget_type = config.rtyp_to_widget_map[str(record.rtyp)]
+    widget_type = config.rtype_to_widget_map[str(record.rtype)]
 
     widgets_to_add: list[Widget] = []
     current_x = start_x
@@ -273,9 +273,9 @@ def generate_bobfile_for_db(
     records_seen = []
 
     for record in database.values():
-        logger.info(f"Processing record: {record.name} of type {record.rtyp}")
-        if record.rtyp not in config.rtyp_to_widget_map:
-            logger.warning(f"Record type {record.rtyp} not supported, skipping.")
+        logger.info(f"Processing record: {record.name} of type {record.rtype}")
+        if record.rtype not in config.rtype_to_widget_map:
+            logger.warning(f"Record type {record.rtype} not supported, skipping.")
         else:
             if record.name in records_seen:
                 logger.info(f"Record {record.name} already processed, skipping.")
@@ -283,7 +283,7 @@ def generate_bobfile_for_db(
                 readback_record = None
                 if record.name + config.readback_suffix in database:
                     rb = database[record.name + config.readback_suffix]
-                    if rb.rtyp in config.rtyp_to_widget_map:
+                    if rb.rtype in config.rtype_to_widget_map:
                         readback_record = rb
                         logger.info(f"Found readback record: {rb.name}")
 

@@ -79,4 +79,4 @@ record (stringin, "compound_stringin_1")
 record (stringin, "compound_stringin_2")
 {
     field(DESC, "COMPOUND_STRINGIN_2 desc")
-})
+}

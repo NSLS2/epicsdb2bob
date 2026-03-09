@@ -20,7 +20,7 @@ from epicsdb2bob.bobfile_gen import (
     template_to_bob,
 )
 from epicsdb2bob.config import (
-    DEFAULT_RTYP_TO_WIDGET_MAP,
+    DEFAULT_RTYPE_TO_WIDGET_MAP,
     EmbedLevel,
     HorizontalAlignment,
     TitleBarFormat,
@@ -74,11 +74,11 @@ def test_align_widget_horizontally(simple_label, alignment):
 
 
 @pytest.mark.parametrize(
-    "rtyp",
-    [*DEFAULT_RTYP_TO_WIDGET_MAP.keys()],
+    "rtype",
+    [*DEFAULT_RTYPE_TO_WIDGET_MAP.keys()],
 )
-def test_add_label_for_record(simple_record_factory, default_config, rtyp):
-    record = simple_record_factory(rtyp, rtyp)
+def test_add_label_for_record(simple_record_factory, default_config, rtype):
+    record = simple_record_factory(rtype, rtype)
     start_x = random.randint(0, 500)
     start_y = random.randint(0, 500)
     label = add_label_for_record(record, start_x, start_y, default_config)
@@ -96,16 +96,16 @@ def test_add_label_for_record(simple_record_factory, default_config, rtyp):
 
 
 @pytest.mark.parametrize(
-    "rtyp",
-    [*DEFAULT_RTYP_TO_WIDGET_MAP.keys()],
+    "rtype",
+    [*DEFAULT_RTYPE_TO_WIDGET_MAP.keys()],
 )
 def test_add_widget_for_record(
-    simple_record_factory, readback_record_factory, default_config, rtyp
+    simple_record_factory, readback_record_factory, default_config, rtype
 ):
-    record = simple_record_factory(rtyp, rtyp)
+    record = simple_record_factory(rtype, rtype)
     start_x = random.randint(0, 100)
     start_y = random.randint(0, 100)
-    if rtyp.endswith("o") or rtyp.endswith("out"):
+    if rtype.endswith("o") or rtype.endswith("out"):
         readback = readback_record_factory(record)
     else:
         readback = None
@@ -128,14 +128,14 @@ def test_add_widget_for_record(
     x_inc = default_config.default_widget_width + default_config.widget_offset
 
     main_widget = widget_list[1]
-    assert isinstance(main_widget, DEFAULT_RTYP_TO_WIDGET_MAP[rtyp])
+    assert isinstance(main_widget, DEFAULT_RTYPE_TO_WIDGET_MAP[rtype])
     assert main_widget.get_element_value("pv_name") == record.name
     assert int(main_widget.get_element_value("x")) == start_x + x_inc
     assert int(main_widget.get_element_value("y")) == start_y
 
     if readback:
         readback_widget = widget_list[2]
-        assert isinstance(readback_widget, DEFAULT_RTYP_TO_WIDGET_MAP[readback.rtyp])
+        assert isinstance(readback_widget, DEFAULT_RTYPE_TO_WIDGET_MAP[readback.rtype])
         assert readback_widget.get_element_value("pv_name") == readback.name
         assert int(readback_widget.get_element_value("x")) == start_x + 2 * x_inc
         assert int(readback_widget.get_element_value("y")) == start_y

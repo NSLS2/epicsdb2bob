@@ -7,8 +7,9 @@ import rpack
 from epicsdbtools import (
     Database,
     LoadIncludesStrategy,
+    Substitution,
     load_database_file,
-    load_template_file,
+    load_substitution_file,
 )
 
 logger = logging.getLogger("epicsdb2bob")
@@ -80,13 +81,11 @@ def find_epics_subs(search_path: Path) -> dict[str, dict[str, list[dict[str, str
             full_file_path = Path(dirpath) / file
             if file.endswith(".substitutions"):
                 try:
-                    dbs_and_macros: list[tuple[str, dict[str, str]]] = (
-                        load_template_file(full_file_path)
-                    )
+                    subs: list[Substitution] = load_substitution_file(full_file_path)
                     epics_sub = {}
                     logger.info(f"Parsed {full_file_path}")
-                    for db_name, macros in dbs_and_macros:
-                        epics_sub.setdefault(db_name, []).append(macros)
+                    for sub in subs:
+                        epics_sub.setdefault(sub.file, []).append(sub.macros)
                     epics_subs[os.path.splitext(file)[0]] = epics_sub
                 except Exception as e:
                     logger.warning(
