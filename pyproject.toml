@@ -13,9 +13,10 @@ classifiers = [
 ]
 description = "CLI utility for auto-creating phoebus engineering screens from EPICS db templates"
 dependencies = [
-    "phoebusgen",
+    "phoebusgen@git+https://github.com/jwlodek/phoebusgen@v4",
     "rectangle-packer",
     "epicsdbtools@git+https://github.com/jwlodek/epicsdbtools",
+    "pyyaml",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
@@ -27,11 +28,9 @@ dev = [
     "copier",
     "pipdeptree",
     "pre-commit",
-    "pyright",
     "pytest",
     "pytest-cov",
     "ruff",
-    "tox-direct",
     "types-mock",
     "import-linter",
 ]
@@ -145,3 +144,8 @@ phoebusgen = ">=3.1.0,<4"
 rectangle-packer = ">=2.0.4,<3"
 python = ">=3.12.12,<3.13"
 import-linter = ">=2.7,<3"
+
+[dependency-groups]
+dev = [
+    "ty>=0.0.43",
+]

@@ -113,12 +113,19 @@ def pack_close_to_square(
 ) -> list[tuple[int, int]]:
     """Pack rectangles into as close to a square as possible.
 
-    Args:
-        rectangle_sizes (list[tuple[int, int]]): List of (width, height) for each rect
-        max_height (int): Maximum allowed height for the packed rectangles.
+    Arguments
+    ---------
+    rectangle_sizes : list[tuple[int, int]]
+        List of (width, height) for each rect
+    max_height : int
+        Maximum allowed height for the packed rectangles.
+    padding : int
+        Padding to add around each rectangle.
 
-    Returns:
-        tuple[int, int]: (total_width, total_height) of the packed rectangles.
+    Returns
+    -------
+    list[tuple[int, int]]
+        List of (x, y) positions for each packed rectangle.
     """
 
     # Add padding to each rectangle size

@@ -6,31 +6,34 @@ from uuid import uuid4
 from xml.etree import ElementTree as ET
 
 from epicsdbtools import Database, Record
-from phoebusgen.screen import Screen
-from phoebusgen.widget import (
+from phoebusgen.v4 import Screen
+from phoebusgen.v4.widgets import (
     ActionButton,
     EmbeddedDisplay,
+    Group,
     Label,
     Rectangle,
+    TextUpdate,
+    Widget,
 )
-from phoebusgen.widget.properties import (
-    _BackgroundColor as HasBackgroundColor,
+from phoebusgen.v4.properties.display import (
+    HasBackgroundColor,
+    HasFont,
+    HasForegroundColor,
+    HasHorizontalAlignment,
 )
-from phoebusgen.widget.properties import (
-    _Font as HasFontSize,
+from phoebusgen.v4.properties import (
+    Color,
+    GroupStyle,
+    HorizontalAlignment,
+    OpenDisplayAction,
+    VerticalAlignment,
 )
-from phoebusgen.widget.properties import (
-    _ForegroundColor as HasForegroundColor,
-)
-from phoebusgen.widget.properties import (
-    _HorizontalAlignment as HasHorizontalAlignment,
-)
-from phoebusgen.widget.widget import _Widget as Widget
+from phoebusgen.v4.properties.types import OpenDisplayTarget
 
 from .config import (
     EmbedLevel,
     EPICSDB2BOBConfig,
-    HorizontalAlignment,
     MacroSetLevel,
     TitleBarFormat,
 )
@@ -54,16 +57,6 @@ def template_to_bob(template: str) -> str:
     return os.path.splitext(os.path.basename(template))[0] + ".bob"
 
 
-def align_widget_horizontally(
-    widget: HasHorizontalAlignment, alignment: HorizontalAlignment
-) -> None:
-    if alignment == HorizontalAlignment.LEFT:
-        widget.horizontal_alignment_left()
-    elif alignment == HorizontalAlignment.CENTER:
-        widget.horizontal_alignment_center()
-    elif alignment == HorizontalAlignment.RIGHT:
-        widget.horizontal_alignment_right()
-
 
 def add_label_for_record(
     record: Record, start_x: int, start_y: int, config: EPICSDB2BOBConfig
@@ -71,17 +64,17 @@ def add_label_for_record(
     description = record.fields.get("DESC", record.name.rsplit(")")[-1])  #  type: ignore
     label = Label(
         short_uuid(),
-        description,
+        str(description),
         start_x,
         start_y,
         config.default_widget_width,
         config.default_widget_height,
     )
 
-    label.foreground_color(*config.palette.get_widget_fg(Label))
-    label.background_color(*config.palette.get_widget_bg(Label))
-    label.font_size(config.font_size)
-    align_widget_horizontally(label, config.label_alignment)
+    label.foreground_color = Color(config.palette.get_widget_fg(Label))
+    label.background_color = Color(config.palette.get_widget_bg(Label))
+    label.font.size = config.font_size
+    label.horizontal_alignment = HorizontalAlignment(config.label_alignment)
 
     return label
 
@@ -122,13 +115,13 @@ def add_widget_for_record(
     )
 
     if isinstance(widget, HasForegroundColor):
-        widget.foreground_color(*config.palette.get_widget_fg(widget_type))
+        widget.foreground_color = Color(config.palette.get_widget_fg(widget_type))
 
     if isinstance(widget, HasBackgroundColor):
-        widget.background_color(*config.palette.get_widget_bg(widget_type))
+        widget.background_color = Color(config.palette.get_widget_bg(widget_type))
 
-    if isinstance(widget, HasFontSize):
-        widget.font_size(config.font_size)
+    if isinstance(widget, HasFont):
+        widget.font.size = config.font_size
 
     widgets_to_add.append(widget)
     current_x += (
@@ -172,20 +165,20 @@ def add_title_bar(
         title_bar_width,
         config.title_bar_heights[title_bar_format],
     )
-    title_bar.foreground_color(*WHITE)
+    title_bar.foreground_color = Color(WHITE)
     if title_bar_format == TitleBarFormat.FULL:
-        title_bar.font_size(config.font_size * 2)
-        title_bar.horizontal_alignment_center()
+        title_bar.font.size = config.font_size * 2
+        title_bar.horizontal_alignment = HorizontalAlignment.CENTER
     elif title_bar_format == TitleBarFormat.MINIMAL:
-        title_bar.auto_size()
-        title_bar.font_size(config.font_size + 2)
-        title_bar.border_width(2)
-        title_bar.border_color(*BLACK)
+        title_bar.auto_size = True
+        title_bar.font.size = config.font_size + 2
+        title_bar.border_width = 2
+        title_bar.border_color = Color(BLACK)
 
-    title_bar.background_color(*config.palette.title_bar_bg)
-    title_bar.foreground_color(*config.palette.title_bar_fg)
-    title_bar.transparent(False)
-    title_bar.vertical_alignment_middle()
+    title_bar.background_color = Color(config.palette.title_bar_bg)
+    title_bar.foreground_color = Color(config.palette.title_bar_fg)
+    title_bar.transparent = False
+    title_bar.vertical_alignment = VerticalAlignment.MIDDLE
     return title_bar
 
 
@@ -200,9 +193,9 @@ def add_border(config: EPICSDB2BOBConfig) -> Rectangle | None:
         0,
         0,
     )
-    border.transparent(True)
-    border.line_width(2)
-    border.line_color(*BLACK)
+    border.transparent = True
+    border.line_width = 2
+    border.line_color = Color(BLACK)
 
     return border
 
@@ -248,27 +241,47 @@ def add_dividing_line(
     dividing_line = Rectangle(
         short_uuid(), x_position, y_position, 2, config.max_screen_height - y_position
     )
-    dividing_line.line_color(*BLACK)
+    dividing_line.line_color = Color(BLACK)
     return dividing_line
 
 
+def _next_widget_position_in_group(
+    current_x: int,
+    current_y: int,
+    start_y: int,
+    col_width_widgets: int,
+    config: EPICSDB2BOBConfig,
+) -> tuple[int, int]:
+    """Compute next widget position within a group (no title bar offset)."""
+    new_x = current_x
+    new_y = current_y + config.default_widget_height + config.widget_offset
+
+    if new_y > config.max_screen_height:
+        new_y = start_y
+        new_x = get_next_x_position(current_x, col_width_widgets, config)
+
+    return new_x, new_y
+
+
 def generate_bobfile_for_db(
-    name: str, database: Database, macros: dict[str, str], config: EPICSDB2BOBConfig
+    name: str,
+    database: Database,
+    macros: dict[str, str],
+    config: EPICSDB2BOBConfig,
+    found_bobfiles: dict[str, Path] | None = None,
 ) -> Screen:
     screen = Screen(name)
 
-    start_x_pos, start_y_pos = get_widget_start_positions(config)
+    start_x_pos = config.widget_offset
+    start_y_pos = config.widget_offset
+
     current_x_pos = start_x_pos
     current_y_pos = start_y_pos
 
     widget_counters: dict[type[Widget], int] = {}
     col_width_widgets = 2
 
-    border = add_border(config)
-    if border:
-        widget_counters[Rectangle] = widget_counters.get(Rectangle, 0) + 1
-        border.name(f"Rectangle_{widget_counters[Rectangle]}")
-        screen.add_widget(border)
+    group_widgets: list[Widget] = []
 
     records_seen = []
 
@@ -302,62 +315,115 @@ def generate_bobfile_for_db(
                     widget_counters[type(widget)] = (
                         widget_counters.get(type(widget), 0) + 1
                     )
-                    widget.name(
+                    widget.name = (
                         f"{type(widget).__name__}_{widget_counters[type(widget)]}"
                     )
                     logger.info(
                         f"Adding {widget.__class__.__name__} widget for {record.name}"
                     )
                     logger.debug(f"Position: ({current_x_pos}, {current_y_pos})")
-                    screen.add_widget(widget)
+                    group_widgets.append(widget)
 
                 records_seen.append(record.name)
                 if readback_record:
                     records_seen.append(readback_record.name)
 
-                current_x_pos, current_y_pos = get_next_widget_position(
-                    current_x_pos, current_y_pos, col_width_widgets, config
+                current_x_pos, current_y_pos = _next_widget_position_in_group(
+                    current_x_pos,
+                    current_y_pos,
+                    start_y_pos,
+                    col_width_widgets,
+                    config,
                 )
                 if current_y_pos == start_y_pos:
                     widget_counters[Rectangle] = widget_counters.get(Rectangle, 0) + 1
                     dividing_line = add_dividing_line(
-                        current_x_pos - config.widget_offset, current_y_pos, config
+                        current_x_pos - config.widget_offset, start_y_pos, config
                     )
-                    dividing_line.name(f"Rectangle_{widget_counters[Rectangle]}")
-                    screen.add_widget(dividing_line)
+                    dividing_line.name = f"Rectangle_{widget_counters[Rectangle]}"
+                    group_widgets.append(dividing_line)
                     col_width_widgets = 2
 
-    screen_width = get_next_x_position(current_x_pos, col_width_widgets, config)
+    # Group box style adds a 10px bounding box inside its edges
+    # Width = 20 (group box sides) + widget_offset * (num_cols + 1) + num_cols * widget_width
+    content_width = col_width_widgets * config.default_widget_width + (col_width_widgets + 1) * config.widget_offset
+    if current_x_pos != start_x_pos:
+        num_screen_cols = (current_x_pos - start_x_pos) // (col_width_widgets * (config.default_widget_width + config.widget_offset)) + 1
+        content_width = num_screen_cols * (col_width_widgets * config.default_widget_width + (col_width_widgets + 1) * config.widget_offset)
+    group_width = 30 + content_width
 
     if current_x_pos != start_x_pos:
-        screen_height = config.max_screen_height + config.widget_offset
+        group_height = config.max_screen_height + 3 * config.widget_offset
     else:
-        screen_height = current_y_pos + config.widget_offset
+        group_height = current_y_pos + 3 * config.widget_offset
 
-    title_bar = add_title_bar(
+    # Wrap all record widgets in a Group with group box style
+    group = Group(
         name.replace("_", " ").replace("-", " "),
-        config,
-        screen_width - config.widget_offset,
+        0,
+        0,
+        group_width,
+        group_height,
     )
-    if title_bar:
-        widget_counters[Label] = widget_counters.get(Label, 0) + 1
-        title_bar.name(f"Label_{widget_counters[Label]}")
-        screen.add_widget(title_bar)
+    group.style = GroupStyle.GROUP_BOX
+    group.transparent = True
+    group.foreground_color = Color(config.palette.get_widget_fg(Group))
+    group.background_color = Color(config.palette.get_widget_bg(Group))
+    group.line_color = Color(config.palette.border_color)
+    group.font.size = config.font_size
 
-    if config.title_bar_format == TitleBarFormat.MINIMAL and border is not None:
-        border.width(screen_width)
-        border.height(
-            screen_height - int(config.title_bar_heights[config.title_bar_format] / 2)
-        )
+    for w in group_widgets:
+        group.add_widget(w)
 
-    screen.background_color(*config.palette.screen_bg)
+    screen.add_widget(group)
 
-    screen.height(screen_height)
-    screen.width(screen_width)
+    screen_width = group_width
+    screen_height = group_height
+
+    # Embed bobfiles for included templates if available
+    included_templates = database.get_included_templates()
+    if found_bobfiles and included_templates and config.embed != EmbedLevel.NONE:
+        embed_y_offset = screen_height
+        for include_name in included_templates:
+            include_bob = template_to_bob(include_name)
+            if include_bob in found_bobfiles:
+                logger.info(f"Embedding included template bobfile: {include_bob}")
+                embed_raw_height, embed_raw_width = get_height_width_of_bobfile(
+                    found_bobfiles[include_bob]
+                )
+                embed_height = embed_raw_height + config.widget_offset
+                embed_width = embed_raw_width + config.widget_offset
+
+                embedded_display = EmbeddedDisplay(
+                    short_uuid(),
+                    include_bob,
+                    config.widget_offset,
+                    embed_y_offset,
+                    embed_width,
+                    embed_height,
+                )
+                widget_counters[EmbeddedDisplay] = (
+                    widget_counters.get(EmbeddedDisplay, 0) + 1
+                )
+                embedded_display.name = (
+                    f"EmbeddedDisplay_{widget_counters[EmbeddedDisplay]}"
+                )
+                screen.add_widget(embedded_display)
+
+                screen_width = max(
+                    screen_width, embed_width + 2 * config.widget_offset
+                )
+                embed_y_offset += embed_height + config.widget_offset
+
+        screen_height = embed_y_offset + config.widget_offset
+
+    screen.background_color = Color(config.palette.screen_bg)
+
+    screen.height = screen_height
+    screen.width = screen_width
 
     if config.macro_set_level == MacroSetLevel.SCREEN:
-        for macro in macros.items():
-            screen.macro(macro[0], macro[1])
+        screen.macros.update(macros)
 
     logger.info(f"Generated screen for database: {name}")
 
@@ -384,14 +450,14 @@ def generate_bobfile_for_substitution(
     """
     substitution_name.replace("_", " ").replace("-", " ").title()
     screen = Screen(substitution_name)
-    screen.background_color(*config.background_color)
+    screen.background_color = Color(config.background_color)
 
     launcher_buttons: dict[str, ActionButton] = {}
 
     logger.info(f"Generating screen for substitution: {substitution_name}")
     logger.debug(f"Found bobfiles: {found_bobfiles}")
 
-    embed_rects: dict[Widget, tuple[int, int]] = {}
+    embed_rects: list[tuple[Widget, tuple[int, int]]] = []
 
     for template in substitution:
         template_instances = substitution[template]
@@ -417,17 +483,18 @@ def generate_bobfile_for_substitution(
                     embed_height,
                 )
 
-                embed_rects[embedded_display] = (embed_width, embed_height)
+                embed_rects.append((embedded_display, (embed_width, embed_height)))
 
-                for macro in instance:
-                    embedded_display.macro(macro, instance[macro])
+                embedded_display.macros = instance
 
             elif template in launcher_buttons:
-                launcher_buttons[template].action_open_display(
-                    template_to_bob(template),
-                    "tab",
-                    f"{os.path.splitext(template)[0]} {i + 1}",
-                    instance,
+                launcher_buttons[template].actions.append(
+                    OpenDisplayAction(
+                        description=f"{os.path.splitext(template)[0]} {i + 1}",
+                        file=Path(template_to_bob(template)),
+                        target=OpenDisplayTarget.NEW_TAB,
+                        macros=instance,
+                    )
                 )
             else:
                 logger.info(f"Creating launcher button for template: {template}")
@@ -442,41 +509,43 @@ def generate_bobfile_for_substitution(
                     config.default_widget_height,
                 )
 
-                launcher_buttons[template].action_open_display(
-                    template_to_bob(template),
-                    "tab",
-                    f"{os.path.splitext(template)[0]} {i + 1}",
-                    instance,
+                launcher_buttons[template].actions.append(
+                    OpenDisplayAction(
+                        description=f"{os.path.splitext(template)[0]} {i + 1}",
+                        file=Path(template_to_bob(template)),
+                        target=OpenDisplayTarget.NEW_TAB,
+                        macros=instance,
+                    )
                 )
-                embed_rects[launcher_buttons[template]] = (
+                embed_rects.append((launcher_buttons[template], (
                     config.default_widget_width + config.widget_offset,
                     config.default_widget_height + config.widget_offset,
-                )
+                )))
 
     packed_x_y_embeds = pack_close_to_square(
-        list(embed_rects.values()),
+        [size for _, size in embed_rects],
         config.max_screen_height,
         padding=config.widget_offset,
     )
 
     embed_stop_positions = [
         (pos[0] + size[0], pos[1] + size[1])
-        for pos, size in zip(packed_x_y_embeds, embed_rects.values(), strict=False)
+        for pos, (_, size) in zip(packed_x_y_embeds, embed_rects, strict=False)
     ]
     screen_width = max([pos[0] for pos in embed_stop_positions], default=0)
     screen_height = max([pos[1] for pos in embed_stop_positions], default=0)
     screen_height = screen_height + 5 * config.widget_offset
 
-    for i, (xy_position, embed) in enumerate(
-        zip(packed_x_y_embeds, embed_rects.keys(), strict=False)
+    for i, (xy_position, (embed, _)) in enumerate(
+        zip(packed_x_y_embeds, embed_rects, strict=False)
     ):
-        embed.x(xy_position[0])
-        embed.y(
+        embed.x = xy_position[0]
+        embed.y = (
             xy_position[1]
             + config.title_bar_heights[config.title_bar_format]
             + 3 * config.widget_offset
         )
-        embed.name(f"{embed.__class__.__name__}_{i + 1}")
+        embed.name = f"{embed.__class__.__name__}_{i + 1}"
         screen.add_widget(embed)
 
     title_bar = add_title_bar(
@@ -488,8 +557,8 @@ def generate_bobfile_for_substitution(
     if title_bar:
         screen.add_widget(title_bar)
 
-    screen.height(screen_height)
-    screen.width(screen_width)
+    screen.height = screen_height
+    screen.width = screen_width
 
     logger.info(f"Generated screen for substitution: {substitution}")
 

@@ -5,9 +5,9 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from phoebusgen import widget as phoebusgen_widget
-from phoebusgen.widget import LED, ChoiceButton, ComboBox, TextEntry, TextUpdate
-from phoebusgen.widget.widget import _Widget as Widget
+import phoebusgen.v4.widgets
+from phoebusgen.v4.widgets import LED, ChoiceButton, ComboBox, TextEntry, TextUpdate, Widget
+from phoebusgen.v4.properties import HorizontalAlignment, Color
 
 from .palettes import BUILTIN_PALETTES, Palette
 
@@ -28,14 +28,6 @@ class TitleBarFormat(StrEnum):
     NONE = "none"  # No title bar
     MINIMAL = "minimal"  # Minimal title bar
     FULL = "full"  # Full title bar
-
-
-class HorizontalAlignment(int, Enum):
-    """Determines the alignment of title bar text."""
-
-    LEFT = 0  # Left aligned
-    CENTER = 1  # Centered
-    RIGHT = 2  # Right aligned
 
 
 class MacroSetLevel(StrEnum):
@@ -86,8 +78,8 @@ class EPICSDB2BOBConfig:
     )
     label_alignment: HorizontalAlignment = HorizontalAlignment.LEFT
     widget_widths: dict[type[Widget], int] = field(default_factory=lambda: {LED: 20})
-    background_color: tuple[int, int, int] = (187, 187, 187)
-    title_bar_color: tuple[int, int, int] = (218, 218, 218)
+    background_color: Color = field(default_factory=lambda: Color((187, 187, 187)))
+    title_bar_color: Color = field(default_factory=lambda: Color((218, 218, 218)))
 
     @staticmethod
     def from_yaml(file_path: Path, cli_args: dict[str, Any]) -> "EPICSDB2BOBConfig":
@@ -102,13 +94,13 @@ class EPICSDB2BOBConfig:
         if "rtype_to_widget_map" in data:
             for key in data["rtype_to_widget_map"]:
                 rtype_to_widget_map[key] = getattr(
-                    phoebusgen_widget, data["rtype_to_widget_map"][key]
+                    phoebusgen.v4.widgets, data["rtype_to_widget_map"][key]
                 )
 
         widget_widths = {LED: 20}
         if "widget_widths" in data:
             for key in data["widget_widths"]:
-                widget_widths[getattr(phoebusgen_widget, key)] = data["widget_widths"][
+                widget_widths[getattr(phoebusgen.v4.widgets, key)] = data["widget_widths"][
                     key
                 ]
 
@@ -147,8 +139,8 @@ class EPICSDB2BOBConfig:
                 TitleBarFormat.FULL: data.get("title_bar_heights", {}).get("full", 40),
             },
             widget_widths={LED: data.get("widget_widths", {}).get("LED", 20)},
-            background_color=tuple(data.get("background_color", (187, 187, 187))),  # type: ignore
-            title_bar_color=tuple(data.get("title_bar_color", (218, 218, 218))),  # type: ignore
+            background_color=Color(tuple(data.get("background_color", (187, 187, 187)))),  # type: ignore
+            title_bar_color=Color(tuple(data.get("title_bar_color", (218, 218, 218)))),  # type: ignore
         )
 
     def to_yaml(self, file_path: Path) -> None:

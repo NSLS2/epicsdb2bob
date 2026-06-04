@@ -1,29 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <display version="2.0.0">
-    <name>compound_db</name>
-    <widget type="rectangle" version="2.0.0">
-      <x>0</x>
-      <y>11</y>
-      <transparent>true</transparent>
-      <line_width>2</line_width>
-      <line_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
-      </line_color>
-      <name>Rectangle_1</name>
-      <width>330</width>
-      <height>630</height>
-    </widget>
+<display version="2.0.0">
+  <name>compound_db</name>
+  <widget type="group" version="3.0.0">
+    <name>compound db</name>
+    <x>0</x>
+    <y>0</y>
+    <width>360</width>
+    <height>640</height>
+    <style>0</style>
+    <transparent>true</transparent>
+    <foreground_color>
+      <color red="10" green="0" blue="184" alpha="255"/>
+    </foreground_color>
+    <background_color>
+      <color red="213" green="213" blue="213" alpha="255"/>
+    </background_color>
+    <line_color>
+      <color red="0" green="0" blue="0" alpha="255"/>
+    </line_color>
+    <font>
+      <font family="Liberation Sans" size="16" style="REGULAR"/>
+    </font>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>30</y>
+      <y>10</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_MBBO_1 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -33,15 +41,15 @@
     </widget>
     <widget type="combo" version="2.0.0">
       <x>170</x>
-      <y>30</y>
+      <y>10</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_mbbo_1</pv_name>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="115" blue="255" green="223" alpha="255"/>
+        <color red="115" green="223" blue="255" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -50,15 +58,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>60</y>
+      <y>40</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_MBBO_2 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -68,15 +76,15 @@
     </widget>
     <widget type="combo" version="2.0.0">
       <x>170</x>
-      <y>60</y>
+      <y>40</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_mbbo_2</pv_name>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="115" blue="255" green="223" alpha="255"/>
+        <color red="115" green="223" blue="255" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -85,15 +93,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>90</y>
+      <y>70</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_MBBI_1 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -103,15 +111,15 @@
     </widget>
     <widget type="textupdate" version="2.0.0">
       <x>170</x>
-      <y>90</y>
+      <y>70</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_mbbi_1</pv_name>
       <foreground_color>
-        <color red="10" blue="184" green="0" alpha="255"/>
+        <color red="10" green="0" blue="184" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -120,15 +128,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>120</y>
+      <y>100</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_MBBI_2 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -138,15 +146,15 @@
     </widget>
     <widget type="textupdate" version="2.0.0">
       <x>170</x>
-      <y>120</y>
+      <y>100</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_mbbi_2</pv_name>
       <foreground_color>
-        <color red="10" blue="184" green="0" alpha="255"/>
+        <color red="10" green="0" blue="184" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -155,15 +163,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>150</y>
+      <y>130</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_BO_1 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -173,15 +181,15 @@
     </widget>
     <widget type="choice" version="2.0.0">
       <x>170</x>
-      <y>150</y>
+      <y>130</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_bo_1</pv_name>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="115" blue="255" green="223" alpha="255"/>
+        <color red="115" green="223" blue="255" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -190,15 +198,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>180</y>
+      <y>160</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_BO_2 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -208,15 +216,15 @@
     </widget>
     <widget type="choice" version="2.0.0">
       <x>170</x>
-      <y>180</y>
+      <y>160</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_bo_2</pv_name>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="115" blue="255" green="223" alpha="255"/>
+        <color red="115" green="223" blue="255" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -225,15 +233,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>210</y>
+      <y>190</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_BI_1 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -243,12 +251,12 @@
     </widget>
     <widget type="led" version="2.0.0">
       <x>170</x>
-      <y>210</y>
+      <y>190</y>
       <width>20</width>
       <height>20</height>
       <pv_name>compound_bi_1</pv_name>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -257,15 +265,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>240</y>
+      <y>220</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_BI_2 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -275,12 +283,12 @@
     </widget>
     <widget type="led" version="2.0.0">
       <x>170</x>
-      <y>240</y>
+      <y>220</y>
       <width>20</width>
       <height>20</height>
       <pv_name>compound_bi_2</pv_name>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -289,15 +297,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>270</y>
+      <y>250</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_AO_1 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -307,15 +315,15 @@
     </widget>
     <widget type="textentry" version="2.0.0">
       <x>170</x>
-      <y>270</y>
+      <y>250</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_ao_1</pv_name>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="115" blue="255" green="223" alpha="255"/>
+        <color red="115" green="223" blue="255" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -324,15 +332,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>300</y>
+      <y>280</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_AO_2 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -342,15 +350,15 @@
     </widget>
     <widget type="textentry" version="2.0.0">
       <x>170</x>
-      <y>300</y>
+      <y>280</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_ao_2</pv_name>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="115" blue="255" green="223" alpha="255"/>
+        <color red="115" green="223" blue="255" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -359,15 +367,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>330</y>
+      <y>310</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_AI_1 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -377,15 +385,15 @@
     </widget>
     <widget type="textupdate" version="2.0.0">
       <x>170</x>
-      <y>330</y>
+      <y>310</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_ai_1</pv_name>
       <foreground_color>
-        <color red="10" blue="184" green="0" alpha="255"/>
+        <color red="10" green="0" blue="184" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -394,15 +402,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>360</y>
+      <y>340</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_AI_2 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -412,15 +420,15 @@
     </widget>
     <widget type="textupdate" version="2.0.0">
       <x>170</x>
-      <y>360</y>
+      <y>340</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_ai_2</pv_name>
       <foreground_color>
-        <color red="10" blue="184" green="0" alpha="255"/>
+        <color red="10" green="0" blue="184" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -429,15 +437,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>390</y>
+      <y>370</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_LONGOUT_1 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -447,15 +455,15 @@
     </widget>
     <widget type="textentry" version="2.0.0">
       <x>170</x>
-      <y>390</y>
+      <y>370</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_longout_1</pv_name>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="115" blue="255" green="223" alpha="255"/>
+        <color red="115" green="223" blue="255" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -464,15 +472,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>420</y>
+      <y>400</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_LONGOUT_2 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -482,15 +490,15 @@
     </widget>
     <widget type="textentry" version="2.0.0">
       <x>170</x>
-      <y>420</y>
+      <y>400</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_longout_2</pv_name>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="115" blue="255" green="223" alpha="255"/>
+        <color red="115" green="223" blue="255" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -499,15 +507,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>450</y>
+      <y>430</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_LONGIN_1 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -517,15 +525,15 @@
     </widget>
     <widget type="textupdate" version="2.0.0">
       <x>170</x>
-      <y>450</y>
+      <y>430</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_longin_1</pv_name>
       <foreground_color>
-        <color red="10" blue="184" green="0" alpha="255"/>
+        <color red="10" green="0" blue="184" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -534,15 +542,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>480</y>
+      <y>460</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_LONGIN_2 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -552,15 +560,15 @@
     </widget>
     <widget type="textupdate" version="2.0.0">
       <x>170</x>
-      <y>480</y>
+      <y>460</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_longin_2</pv_name>
       <foreground_color>
-        <color red="10" blue="184" green="0" alpha="255"/>
+        <color red="10" green="0" blue="184" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -569,15 +577,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>510</y>
+      <y>490</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_STRINGOUT_1 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -587,15 +595,15 @@
     </widget>
     <widget type="textentry" version="2.0.0">
       <x>170</x>
-      <y>510</y>
+      <y>490</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_stringout_1</pv_name>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="115" blue="255" green="223" alpha="255"/>
+        <color red="115" green="223" blue="255" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -604,15 +612,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>540</y>
+      <y>520</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_STRINGOUT_2 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -622,15 +630,15 @@
     </widget>
     <widget type="textentry" version="2.0.0">
       <x>170</x>
-      <y>540</y>
+      <y>520</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_stringout_2</pv_name>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="115" blue="255" green="223" alpha="255"/>
+        <color red="115" green="223" blue="255" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -639,15 +647,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>570</y>
+      <y>550</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_STRINGIN_1 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -657,15 +665,15 @@
     </widget>
     <widget type="textupdate" version="2.0.0">
       <x>170</x>
-      <y>570</y>
+      <y>550</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_stringin_1</pv_name>
       <foreground_color>
-        <color red="10" blue="184" green="0" alpha="255"/>
+        <color red="10" green="0" blue="184" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -674,15 +682,15 @@
     </widget>
     <widget type="label" version="2.0.0">
       <x>10</x>
-      <y>600</y>
+      <y>580</y>
       <width>150</width>
       <height>20</height>
       <text>COMPOUND_STRINGIN_2 desc</text>
       <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
+        <color red="0" green="0" blue="0" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
@@ -692,48 +700,26 @@
     </widget>
     <widget type="textupdate" version="2.0.0">
       <x>170</x>
-      <y>600</y>
+      <y>580</y>
       <width>150</width>
       <height>20</height>
       <pv_name>compound_stringin_2</pv_name>
       <foreground_color>
-        <color red="10" blue="184" green="0" alpha="255"/>
+        <color red="10" green="0" blue="184" alpha="255"/>
       </foreground_color>
       <background_color>
-        <color red="187" blue="187" green="187" alpha="255"/>
+        <color red="187" green="187" blue="187" alpha="255"/>
       </background_color>
       <font>
         <font family="Liberation Sans" size="16" style="REGULAR"/>
       </font>
       <name>TextUpdate_8</name>
     </widget>
-    <widget type="label" version="2.0.0">
-      <x>10</x>
-      <y>0</y>
-      <width>320</width>
-      <height>20</height>
-      <text>compound db</text>
-      <auto_size>true</auto_size>
-      <font>
-        <font family="Liberation Sans" size="18" style="REGULAR"/>
-      </font>
-      <border_width>2</border_width>
-      <border_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
-      </border_color>
-      <background_color>
-        <color red="218" blue="218" green="218" alpha="255"/>
-      </background_color>
-      <foreground_color>
-        <color red="0" blue="0" green="0" alpha="255"/>
-      </foreground_color>
-      <transparent>false</transparent>
-      <vertical_alignment>1</vertical_alignment>
-      <name>Label_21</name>
-    </widget>
-    <background_color>
-      <color red="187" blue="187" green="187" alpha="255"/>
-    </background_color>
-    <height>640</height>
-    <width>330</width>
-  </display>
+  </widget>
+  <background_color>
+    <color red="187" green="187" blue="187" alpha="255"/>
+  </background_color>
+  <height>640</height>
+  <width>360</width>
+  <macros/>
+</display>

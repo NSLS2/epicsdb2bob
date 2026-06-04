@@ -1,15 +1,15 @@
 import copy
 
 import pytest
-from phoebusgen.widget import (
+from phoebusgen.v4.widgets import (
     ActionButton,
     ChoiceButton,
     ComboBox,
     Label,
     TextEntry,
     TextUpdate,
+    Widget,
 )
-from phoebusgen.widget.widget import _Widget as Widget
 
 from epicsdb2bob.palettes import BLACK, BUILTIN_PALETTES, WHITE, Palette
 

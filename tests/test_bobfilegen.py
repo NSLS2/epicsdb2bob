@@ -3,14 +3,14 @@ import random
 from pathlib import Path
 
 import pytest
-from phoebusgen.widget import Label, Rectangle
+from phoebusgen.v4.widgets import Label, Rectangle
+from phoebusgen.v4.properties import HorizontalAlignment as PGHorizontalAlignment
 
 from epicsdb2bob.bobfile_gen import (
     add_border,
     add_dividing_line,
     add_label_for_record,
     add_widget_for_record,
-    align_widget_horizontally,
     generate_bobfile_for_db,
     generate_bobfile_for_substitution,
     get_height_width_of_bobfile,
@@ -50,7 +50,7 @@ def test_generate_bobfiles(db_with_readbacks, default_config, tmp_path):
 def test_get_bobfile_height_width():
     height, width = get_height_width_of_bobfile("tests/outputs/db_with_readbacks.bob")
     assert height == 640
-    assert width == 490
+    assert width == 510
 
 
 def test_template_to_bobfile_name():
@@ -59,18 +59,16 @@ def test_template_to_bobfile_name():
 
 
 @pytest.mark.parametrize(
-    "alignment",
+    "alignment,expected",
     [
-        (HorizontalAlignment.LEFT),
-        (HorizontalAlignment.CENTER),
-        (HorizontalAlignment.RIGHT),
+        (HorizontalAlignment.LEFT, PGHorizontalAlignment.LEFT),
+        (HorizontalAlignment.CENTER, PGHorizontalAlignment.CENTER),
+        (HorizontalAlignment.RIGHT, PGHorizontalAlignment.RIGHT),
     ],
 )
-def test_align_widget_horizontally(simple_label, alignment):
-    align_widget_horizontally(simple_label, alignment)
-    assert simple_label.get_element_value("horizontal_alignment") == str(
-        alignment.value
-    )
+def test_align_widget_horizontally(simple_label, alignment, expected):
+    simple_label.horizontal_alignment = PGHorizontalAlignment(alignment)
+    assert simple_label.horizontal_alignment == expected
 
 
 @pytest.mark.parametrize(
@@ -85,14 +83,12 @@ def test_add_label_for_record(simple_record_factory, default_config, rtype):
     print(label)
     expected_text = f"{record.name.upper()} desc"
 
-    assert label.get_element_value("text") == expected_text
-    assert int(label.get_element_value("width")) == default_config.default_widget_width
-    assert (
-        int(label.get_element_value("height")) == default_config.default_widget_height
-    )
-    assert int(label.get_element_value("x")) == start_x
-    assert int(label.get_element_value("y")) == start_y
-    assert int(label.get_element_value("horizontal_alignment")) == 0  # LEFT
+    assert label.text == expected_text
+    assert label.width == default_config.default_widget_width
+    assert label.height == default_config.default_widget_height
+    assert label.x == start_x
+    assert label.y == start_y
+    assert label.horizontal_alignment == PGHorizontalAlignment.LEFT
 
 
 @pytest.mark.parametrize(
@@ -121,24 +117,24 @@ def test_add_widget_for_record(
 
     label = widget_list[0]
     assert isinstance(label, Label)
-    assert label.get_element_value("text") == f"{record.name.upper()} desc"
-    assert int(label.get_element_value("x")) == start_x
-    assert int(label.get_element_value("y")) == start_y
+    assert label.text == f"{record.name.upper()} desc"
+    assert label.x == start_x
+    assert label.y == start_y
 
     x_inc = default_config.default_widget_width + default_config.widget_offset
 
     main_widget = widget_list[1]
     assert isinstance(main_widget, DEFAULT_RTYPE_TO_WIDGET_MAP[rtype])
-    assert main_widget.get_element_value("pv_name") == record.name
-    assert int(main_widget.get_element_value("x")) == start_x + x_inc
-    assert int(main_widget.get_element_value("y")) == start_y
+    assert main_widget.pv_name == record.name
+    assert main_widget.x == start_x + x_inc
+    assert main_widget.y == start_y
 
     if readback:
         readback_widget = widget_list[2]
         assert isinstance(readback_widget, DEFAULT_RTYPE_TO_WIDGET_MAP[readback.rtype])
-        assert readback_widget.get_element_value("pv_name") == readback.name
-        assert int(readback_widget.get_element_value("x")) == start_x + 2 * x_inc
-        assert int(readback_widget.get_element_value("y")) == start_y
+        assert readback_widget.pv_name == readback.name
+        assert readback_widget.x == start_x + 2 * x_inc
+        assert readback_widget.y == start_y
 
 
 @pytest.mark.parametrize(
@@ -157,11 +153,11 @@ def test_add_border(default_config, title_bar_format):
         assert border is None
     else:
         assert border is not None
-        assert int(border.get_element_value("x")) == 0
-        assert int(border.get_element_value("y")) == 11
+        assert border.x == 0
+        assert border.y == 11
         assert isinstance(border, Rectangle)
-        assert int(border.get_element_value("line_width")) == 2
-        assert border.get_element_value("transparent") == "true"
+        assert border.line_width == 2
+        assert border.transparent is True
 
 
 @pytest.mark.parametrize(
@@ -187,11 +183,11 @@ def test_get_widget_start_positions(default_config, title_bar_format):
 def test_add_dividing_line(default_config):
     dividing_line = add_dividing_line(10, 20, default_config)
     assert dividing_line is not None
-    assert int(dividing_line.get_element_value("x")) == 10
-    assert int(dividing_line.get_element_value("y")) == 20
+    assert dividing_line.x == 10
+    assert dividing_line.y == 20
     assert isinstance(dividing_line, Rectangle)
-    assert int(dividing_line.get_element_value("width")) == 2
-    assert int(dividing_line.get_element_value("height")) == 1180
+    assert dividing_line.width == 2
+    assert dividing_line.height == 1180
 
 
 @pytest.mark.parametrize(

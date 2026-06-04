@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 from epicsdbtools import Database, Record, RecordType
-from phoebusgen.widget import Label
+from phoebusgen.v4.widgets import Label
 
 from epicsdb2bob.config import DEFAULT_RTYPE_TO_WIDGET_MAP, EPICSDB2BOBConfig
 

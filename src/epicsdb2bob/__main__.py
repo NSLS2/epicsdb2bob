@@ -179,7 +179,9 @@ def main() -> None:
 
     databases = find_epics_dbs_and_templates(args.input_path, macros)
     for name in databases:
-        screen = generate_bobfile_for_db(name, databases[name], macros, config)
+        screen = generate_bobfile_for_db(
+            name, databases[name], macros, config, found_bobfiles=written_bobfiles
+        )
 
         full_output_path = os.path.join(args.output_path, f"{name}.bob")
         screen.write_screen(full_output_path)
