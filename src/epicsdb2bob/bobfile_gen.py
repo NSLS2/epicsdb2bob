@@ -387,7 +387,8 @@ def generate_bobfile_for_db(
 
     # Embed bobfiles for included templates if available
     included_templates = database.get_included_templates()
-    if found_bobfiles and included_templates and config.embed != EmbedLevel.NONE:
+    embed_level = config.get_embed_level(name)
+    if found_bobfiles and included_templates and embed_level != EmbedLevel.NONE:
         embed_sizes: list[tuple[int, int]] = []
         embed_widgets: list[EmbeddedDisplay] = []
 
@@ -489,9 +490,10 @@ def generate_bobfile_for_substitution(
         template_instances = substitution[template]
         logger.info(f"Processing template: {template}")
         for i, instance in enumerate(template_instances):
+            embed_level = config.get_embed_level(substitution_name)
             if template_to_bob(template) in found_bobfiles and (
-                config.embed == EmbedLevel.ALL
-                or (config.embed == EmbedLevel.SINGLE and len(template_instances) == 1)
+                embed_level == EmbedLevel.ALL
+                or (embed_level == EmbedLevel.SINGLE and len(template_instances) == 1)
             ):
                 logger.info(f"Embedding display for instance: {instance}")
                 embed_raw_height, embed_raw_width = get_height_width_of_bobfile(

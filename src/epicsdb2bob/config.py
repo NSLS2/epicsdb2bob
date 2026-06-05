@@ -80,6 +80,11 @@ class EPICSDB2BOBConfig:
     widget_widths: dict[type[Widget], int] = field(default_factory=lambda: {LED: 20})
     background_color: Color = field(default_factory=lambda: Color((187, 187, 187)))
     title_bar_color: Color = field(default_factory=lambda: Color((218, 218, 218)))
+    embed_overrides: dict[str, EmbedLevel] = field(default_factory=dict)
+
+    def get_embed_level(self, name: str) -> EmbedLevel:
+        """Get the effective embed level for a given file name."""
+        return self.embed_overrides.get(name, self.embed)
 
     @staticmethod
     def from_yaml(file_path: Path, cli_args: dict[str, Any]) -> "EPICSDB2BOBConfig":
@@ -141,6 +146,10 @@ class EPICSDB2BOBConfig:
             widget_widths={LED: data.get("widget_widths", {}).get("LED", 20)},
             background_color=Color(tuple(data.get("background_color", (187, 187, 187)))),  # type: ignore
             title_bar_color=Color(tuple(data.get("title_bar_color", (218, 218, 218)))),  # type: ignore
+            embed_overrides={
+                k: EmbedLevel(v)
+                for k, v in data.get("embed_overrides", {}).items()
+            },
         )
 
     def to_yaml(self, file_path: Path) -> None:
