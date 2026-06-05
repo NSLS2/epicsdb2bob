@@ -344,46 +344,53 @@ def generate_bobfile_for_db(
                     group_widgets.append(dividing_line)
                     col_width_widgets = 2
 
-    # Group box style adds a 10px bounding box inside its edges
-    # Width = 20 (group box sides) + widget_offset * (num_cols + 1) + num_cols * widget_width
-    content_width = col_width_widgets * config.default_widget_width + (col_width_widgets + 1) * config.widget_offset
-    if current_x_pos != start_x_pos:
-        num_screen_cols = (current_x_pos - start_x_pos) // (col_width_widgets * (config.default_widget_width + config.widget_offset)) + 1
-        content_width = num_screen_cols * (col_width_widgets * config.default_widget_width + (col_width_widgets + 1) * config.widget_offset)
-    group_width = 30 + content_width
+    screen_width = 0
+    screen_height = 0
 
-    if current_x_pos != start_x_pos:
-        group_height = config.max_screen_height + 3 * config.widget_offset
-    else:
-        group_height = current_y_pos + 3 * config.widget_offset
+    # Only create the group if there are records to display
+    if group_widgets:
+        # Group box style adds a 10px bounding box inside its edges
+        # Width = 30 + widget_offset * (num_cols + 1) + num_cols * widget_width
+        content_width = col_width_widgets * config.default_widget_width + (col_width_widgets + 1) * config.widget_offset
+        if current_x_pos != start_x_pos:
+            num_screen_cols = (current_x_pos - start_x_pos) // (col_width_widgets * (config.default_widget_width + config.widget_offset)) + 1
+            content_width = num_screen_cols * (col_width_widgets * config.default_widget_width + (col_width_widgets + 1) * config.widget_offset)
+        group_width = 30 + content_width
 
-    # Wrap all record widgets in a Group with group box style
-    group = Group(
-        name.replace("_", " ").replace("-", " "),
-        0,
-        0,
-        group_width,
-        group_height,
-    )
-    group.style = GroupStyle.GROUP_BOX
-    group.transparent = True
-    group.foreground_color = Color(config.palette.get_widget_fg(Group))
-    group.background_color = Color(config.palette.get_widget_bg(Group))
-    group.line_color = Color(config.palette.border_color)
-    group.font.size = config.font_size
+        if current_x_pos != start_x_pos:
+            group_height = config.max_screen_height + 3 * config.widget_offset
+        else:
+            group_height = current_y_pos + 3 * config.widget_offset
 
-    for w in group_widgets:
-        group.add_widget(w)
+        # Wrap all record widgets in a Group with group box style
+        group = Group(
+            name.replace("_", " ").replace("-", " "),
+            0,
+            0,
+            group_width,
+            group_height,
+        )
+        group.style = GroupStyle.GROUP_BOX
+        group.transparent = True
+        group.foreground_color = Color(config.palette.get_widget_fg(Group))
+        group.background_color = Color(config.palette.get_widget_bg(Group))
+        group.line_color = Color(config.palette.border_color)
+        group.font.size = config.font_size
 
-    screen.add_widget(group)
+        for w in group_widgets:
+            group.add_widget(w)
 
-    screen_width = group_width
-    screen_height = group_height
+        screen.add_widget(group)
+
+        screen_width = group_width
+        screen_height = group_height
 
     # Embed bobfiles for included templates if available
     included_templates = database.get_included_templates()
     if found_bobfiles and included_templates and config.embed != EmbedLevel.NONE:
-        embed_y_offset = screen_height
+        embed_sizes: list[tuple[int, int]] = []
+        embed_widgets: list[EmbeddedDisplay] = []
+
         for include_name in included_templates:
             include_bob = template_to_bob(include_name)
             if include_bob in found_bobfiles:
@@ -397,8 +404,8 @@ def generate_bobfile_for_db(
                 embedded_display = EmbeddedDisplay(
                     short_uuid(),
                     include_bob,
-                    config.widget_offset,
-                    embed_y_offset,
+                    0,
+                    0,
                     embed_width,
                     embed_height,
                 )
@@ -408,14 +415,33 @@ def generate_bobfile_for_db(
                 embedded_display.name = (
                     f"EmbeddedDisplay_{widget_counters[EmbeddedDisplay]}"
                 )
-                screen.add_widget(embedded_display)
+                embed_sizes.append((embed_width, embed_height))
+                embed_widgets.append(embedded_display)
 
-                screen_width = max(
-                    screen_width, embed_width + 2 * config.widget_offset
-                )
-                embed_y_offset += embed_height + config.widget_offset
+        if embed_widgets:
+            packed_positions = pack_close_to_square(
+                embed_sizes, config.max_screen_height, padding=config.widget_offset
+            )
 
-        screen_height = embed_y_offset + config.widget_offset
+            # Offset embeds below the group if one exists
+            y_offset = screen_height
+
+            for (px, py), embed_widget, (ew, eh) in zip(
+                packed_positions, embed_widgets, embed_sizes, strict=False
+            ):
+                embed_widget.x = px + config.widget_offset
+                embed_widget.y = py + y_offset + config.widget_offset
+                screen.add_widget(embed_widget)
+
+            embed_stop_positions = [
+                (pos[0] + size[0], pos[1] + size[1])
+                for pos, size in zip(packed_positions, embed_sizes, strict=False)
+            ]
+            embed_max_x = max(pos[0] for pos in embed_stop_positions)
+            embed_max_y = max(pos[1] for pos in embed_stop_positions)
+
+            screen_width = max(screen_width, embed_max_x + 2 * config.widget_offset)
+            screen_height = y_offset + embed_max_y + 2 * config.widget_offset
 
     screen.background_color = Color(config.palette.screen_bg)
 

@@ -50,7 +50,7 @@ def test_generate_bobfiles(db_with_readbacks, default_config, tmp_path):
 def test_get_bobfile_height_width():
     height, width = get_height_width_of_bobfile("tests/outputs/db_with_readbacks.bob")
     assert height == 640
-    assert width == 510
+    assert width == 520
 
 
 def test_template_to_bobfile_name():
