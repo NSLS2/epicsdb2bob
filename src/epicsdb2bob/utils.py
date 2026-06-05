@@ -23,14 +23,20 @@ def order_dbs_by_includes(databases: dict[str, Database]) -> OrderedDict[str, Da
             if db_name in ordered_dbs:
                 continue
             includes = db.get_included_templates()
-            if all(os.path.splitext(include)[0] in ordered_dbs for include in includes):
-                ordered_dbs[db_name] = db
-            elif not all(
-                os.path.splitext(include)[0] in databases for include in includes
-            ):
+            # Only consider includes that are in the local database set
+            local_includes = [
+                inc for inc in includes
+                if os.path.splitext(inc)[0] in databases
+            ]
+            external_includes = [
+                inc for inc in includes
+                if os.path.splitext(inc)[0] not in databases
+            ]
+            if external_includes:
                 logger.warning(
-                    f"Database {db_name} includes unknown templates: {includes}"
+                    f"Database {db_name} includes external templates: {external_includes}"
                 )
+            if all(os.path.splitext(inc)[0] in ordered_dbs for inc in local_includes):
                 ordered_dbs[db_name] = db
         endlen = len(ordered_dbs)
         if start_len == endlen:
