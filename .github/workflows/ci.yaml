@@ -11,49 +11,59 @@ on:
 
 jobs:
   lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-
-      - name: Install Dependencies
-        run: pip install .[dev]
+      - name: Setup uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
 
       - name: Lint
-        run: pre-commit run --all-files
+        run: uv run --frozen pre-commit run --all-files
 
-  test:
-    name: Unit Tests
+
+  type-check:
+    name: Type Check
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v6
         with:
-          fetch-depth: 0
           persist-credentials: false
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - name: Setup uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+
+      - name: Run type checks
+        run: uv run --frozen ty check src tests
+
+  test:
+    name: Unit Tests - Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+      fail-fast: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
         with:
-          python-version: '3.12'
+          persist-credentials: false
 
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install .[dev]
+      - name: Setup uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          python-version: ${{ matrix.python-version }}
 
-      - name: Run Unit Tests
-        run: |
-          pytest --cov=epicsdb2bob --cov-report=xml:coverage.xml
+      - name: Run tests for given python version
+        run: uv run --frozen pytest --cov=src/epicsdb2bob --cov-report=xml --cov-report=term
 
       - name: Upload Coverage To Codecov
+        if: ${{ matrix.python-version == '3.13' }}
         uses: codecov/codecov-action@v5
         with:
           name: Coverage

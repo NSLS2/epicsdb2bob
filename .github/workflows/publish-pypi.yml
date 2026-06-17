@@ -1,0 +1,52 @@
+name: Publish Release to PyPI
+permissions:
+  contents: read
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  pypi-publish:
+    name: upload release to PyPI
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+
+      - name: Build sdist and wheel
+        run: >
+          export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct) &&
+          uv build
+
+      - name: Upload sdist and wheel as artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: Install produced wheel
+        run: |
+          uv pip install dist/*.whl --system
+
+      - name: Verify installation
+        run: |
+          epicsdb2bob --version

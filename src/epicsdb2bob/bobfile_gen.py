@@ -278,7 +278,7 @@ def generate_bobfile_for_db(
             logger.warning(f"Record type {record.rtype} not supported, skipping.")
         elif record.fields.get("DTYP", None) is None:
             logger.warning(
-                f"Record {record.name} does not have DTYP field. Assuming it is an override, skipping."
+                f"{record.name} does not define DTYP. Assuming it's an override."
             )
         else:
             if record.name in records_seen:
