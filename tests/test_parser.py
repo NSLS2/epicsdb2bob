@@ -119,7 +119,7 @@ def test_order_dbs_by_includes_unknown_include(
     with caplog.at_level("WARNING"):
         order_dbs_by_includes(databases)
 
-    assert "includes unknown templates" in caplog.text
+    assert "includes external templates" in caplog.text
 
 
 def test_parse_epics_db_file_invalid(tmp_path: Path, caplog: pytest.LogCaptureFixture):
