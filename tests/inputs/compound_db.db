@@ -3,80 +3,100 @@ include "simple_db.db"
 record (mbbo, "compound_mbbo_1")
 {
     field(DESC, "COMPOUND_MBBO_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (mbbo, "compound_mbbo_2")
 {
     field(DESC, "COMPOUND_MBBO_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (mbbi, "compound_mbbi_1")
 {
     field(DESC, "COMPOUND_MBBI_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (mbbi, "compound_mbbi_2")
 {
     field(DESC, "COMPOUND_MBBI_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (bo, "compound_bo_1")
 {
     field(DESC, "COMPOUND_BO_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (bo, "compound_bo_2")
 {
     field(DESC, "COMPOUND_BO_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (bi, "compound_bi_1")
 {
     field(DESC, "COMPOUND_BI_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (bi, "compound_bi_2")
 {
     field(DESC, "COMPOUND_BI_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (ao, "compound_ao_1")
 {
     field(DESC, "COMPOUND_AO_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (ao, "compound_ao_2")
 {
     field(DESC, "COMPOUND_AO_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (ai, "compound_ai_1")
 {
     field(DESC, "COMPOUND_AI_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (ai, "compound_ai_2")
 {
     field(DESC, "COMPOUND_AI_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (longout, "compound_longout_1")
 {
     field(DESC, "COMPOUND_LONGOUT_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (longout, "compound_longout_2")
 {
     field(DESC, "COMPOUND_LONGOUT_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (longin, "compound_longin_1")
 {
     field(DESC, "COMPOUND_LONGIN_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (longin, "compound_longin_2")
 {
     field(DESC, "COMPOUND_LONGIN_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (stringout, "compound_stringout_1")
 {
     field(DESC, "COMPOUND_STRINGOUT_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (stringout, "compound_stringout_2")
 {
     field(DESC, "COMPOUND_STRINGOUT_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (stringin, "compound_stringin_1")
 {
     field(DESC, "COMPOUND_STRINGIN_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (stringin, "compound_stringin_2")
 {
     field(DESC, "COMPOUND_STRINGIN_2 desc")
+    field(DTYP, "Soft Channel")
 }

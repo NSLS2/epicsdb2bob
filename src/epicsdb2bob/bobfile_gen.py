@@ -68,7 +68,7 @@ def align_widget_horizontally(
 def add_label_for_record(
     record: Record, start_x: int, start_y: int, config: EPICSDB2BOBConfig
 ) -> Label:
-    description = record.fields.get("DESC", record.name.rsplit(")")[-1])  #  type: ignore
+    description = str(record.fields.get("DESC", record.name.rsplit(")")[-1]))
     label = Label(
         short_uuid(),
         description,

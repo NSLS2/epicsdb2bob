@@ -157,9 +157,9 @@ def main() -> None:
 
         if config.debug:
             logger.setLevel(logging.DEBUG)
-            import epicsdbtools.log.logger as epicsdbtools_logger
+            import epicsdbtools.log as epicsdbtools_log
 
-            epicsdbtools_logger.setLevel(logging.DEBUG)
+            epicsdbtools_log.logger.setLevel(logging.DEBUG)
         logger.debug("Loaded configuration from .epicsdb2bob.yml")
     else:
         args.palette = BUILTIN_PALETTES[args.palette]

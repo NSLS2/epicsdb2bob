@@ -1,120 +1,150 @@
 record (mbbo, "test_mbbo_1")
 {
     field(DESC, "TEST_MBBO_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (mbbo, "test_mbbo_2")
 {
     field(DESC, "TEST_MBBO_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (mbbi, "test_mbbi_1")
 {
     field(DESC, "TEST_MBBI_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (mbbi, "test_mbbi_2")
 {
     field(DESC, "TEST_MBBI_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (bo, "test_bo_1")
 {
     field(DESC, "TEST_BO_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (bo, "test_bo_2")
 {
     field(DESC, "TEST_BO_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (bi, "test_bi_1")
 {
     field(DESC, "TEST_BI_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (bi, "test_bi_2")
 {
     field(DESC, "TEST_BI_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (ao, "test_ao_1")
 {
     field(DESC, "TEST_AO_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (ao, "test_ao_2")
 {
     field(DESC, "TEST_AO_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (ai, "test_ai_1")
 {
     field(DESC, "TEST_AI_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (ai, "test_ai_2")
 {
     field(DESC, "TEST_AI_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (longout, "test_longout_1")
 {
     field(DESC, "TEST_LONGOUT_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (longout, "test_longout_2")
 {
     field(DESC, "TEST_LONGOUT_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (longin, "test_longin_1")
 {
     field(DESC, "TEST_LONGIN_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (longin, "test_longin_2")
 {
     field(DESC, "TEST_LONGIN_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (stringout, "test_stringout_1")
 {
     field(DESC, "TEST_STRINGOUT_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (stringout, "test_stringout_2")
 {
     field(DESC, "TEST_STRINGOUT_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (stringin, "test_stringin_1")
 {
     field(DESC, "TEST_STRINGIN_1 desc")
+    field(DTYP, "Soft Channel")
 }
 record (stringin, "test_stringin_2")
 {
     field(DESC, "TEST_STRINGIN_2 desc")
+    field(DTYP, "Soft Channel")
 }
 record (mbbi, "test_mbbo_1_RBV")
 {
     field(DESC, "TEST_MBBO_1 RB desc")
+    field(DTYP, "Soft Channel")
 }
 record (mbbi, "test_mbbo_2_RBV")
 {
     field(DESC, "TEST_MBBO_2 RB desc")
+    field(DTYP, "Soft Channel")
 }
 record (bi, "test_bo_1_RBV")
 {
     field(DESC, "TEST_BO_1 RB desc")
+    field(DTYP, "Soft Channel")
 }
 record (bi, "test_bo_2_RBV")
 {
     field(DESC, "TEST_BO_2 RB desc")
+    field(DTYP, "Soft Channel")
 }
 record (ai, "test_ao_1_RBV")
 {
     field(DESC, "TEST_AO_1 RB desc")
+    field(DTYP, "Soft Channel")
 }
 record (ai, "test_ao_2_RBV")
 {
     field(DESC, "TEST_AO_2 RB desc")
+    field(DTYP, "Soft Channel")
 }
 record (longin, "test_longout_1_RBV")
 {
     field(DESC, "TEST_LONGOUT_1 RB desc")
+    field(DTYP, "Soft Channel")
 }
 record (longin, "test_longout_2_RBV")
 {
     field(DESC, "TEST_LONGOUT_2 RB desc")
+    field(DTYP, "Soft Channel")
 }
 record (stringin, "test_stringout_1_RBV")
 {
     field(DESC, "TEST_STRINGOUT_1 RB desc")
+    field(DTYP, "Soft Channel")
 }
 record (stringin, "test_stringout_2_RBV")
 {
     field(DESC, "TEST_STRINGOUT_2 RB desc")
+    field(DTYP, "Soft Channel")
 }

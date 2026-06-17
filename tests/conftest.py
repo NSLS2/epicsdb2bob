@@ -11,9 +11,10 @@ from epicsdb2bob.config import DEFAULT_RTYPE_TO_WIDGET_MAP, EPICSDB2BOBConfig
 @pytest.fixture
 def simple_record_factory() -> Callable[[str, str], Record]:
     def _record_factory(rtype: str, name: str) -> Record:
-        record = Record(name, RecordType[rtype.upper()])  # type: ignore
+        record = Record(name, RecordType[rtype.upper()])
         record.fields = {  # type: ignore
             "DESC": f"{name.upper()} desc",
+            "DTYP": "Soft Channel",
         }
         return record
 
@@ -23,13 +24,14 @@ def simple_record_factory() -> Callable[[str, str], Record]:
 @pytest.fixture
 def readback_record_factory() -> Callable[[Record], Record]:
     def _readback_factory(out_record: Record) -> Record:
-        if out_record.rtype.endswith("o"):  # type: ignore
-            rtype = out_record.rtype[:-1] + "i"  # type: ignore
+        if out_record.rtype.endswith("o"):
+            rtype = out_record.rtype[:-1] + "i"
         else:
-            rtype = out_record.rtype[:-3] + "in"  # type: ignore
-        record = Record(out_record.name + "_RBV", RecordType[rtype.upper()])  # type: ignore
+            rtype = out_record.rtype[:-3] + "in"
+        record = Record(out_record.name + "_RBV", RecordType[rtype.upper()])
         record.fields = {  # type: ignore
-            "DESC": f"{out_record.name.upper()} RB desc",  # type: ignore
+            "DESC": f"{out_record.name.upper()} RB desc",
+            "DTYP": "Soft Channel",
         }
         return record
 

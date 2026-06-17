@@ -153,8 +153,8 @@ class EPICSDB2BOBConfig:
                 TitleBarFormat.FULL: data.get("title_bar_heights", {}).get("full", 40),
             },
             widget_widths={LED: data.get("widget_widths", {}).get("LED", 20)},
-            background_color=tuple(data.get("background_color", (187, 187, 187))),  # type: ignore
-            title_bar_color=tuple(data.get("title_bar_color", (218, 218, 218))),  # type: ignore
+            background_color=tuple(data.get("background_color", (187, 187, 187))),
+            title_bar_color=tuple(data.get("title_bar_color", (218, 218, 218))),
             required_record_fields=data.get("required_record_fields", ["DESC", "DTYP"]),
         )
 
