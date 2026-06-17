@@ -276,6 +276,10 @@ def generate_bobfile_for_db(
         logger.info(f"Processing record: {record.name} of type {record.rtype}")
         if record.rtype not in config.rtype_to_widget_map:
             logger.warning(f"Record type {record.rtype} not supported, skipping.")
+        elif record.fields.get("DTYP", None) is None:
+            logger.warning(
+                f"Record {record.name} does not have DTYP field. Assuming it is an override, skipping."
+            )
         else:
             if record.name in records_seen:
                 logger.info(f"Record {record.name} already processed, skipping.")

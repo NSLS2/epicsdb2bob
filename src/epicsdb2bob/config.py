@@ -88,6 +88,12 @@ class EPICSDB2BOBConfig:
     widget_widths: dict[type[Widget], int] = field(default_factory=lambda: {LED: 20})
     background_color: tuple[int, int, int] = (187, 187, 187)
     title_bar_color: tuple[int, int, int] = (218, 218, 218)
+    required_record_fields: list[str] = field(
+        default_factory=lambda: [
+            "DESC",
+            "DTYP",
+        ]
+    )
 
     @staticmethod
     def from_yaml(file_path: Path, cli_args: dict[str, Any]) -> "EPICSDB2BOBConfig":
@@ -149,6 +155,7 @@ class EPICSDB2BOBConfig:
             widget_widths={LED: data.get("widget_widths", {}).get("LED", 20)},
             background_color=tuple(data.get("background_color", (187, 187, 187))),  # type: ignore
             title_bar_color=tuple(data.get("title_bar_color", (218, 218, 218))),  # type: ignore
+            required_record_fields=data.get("required_record_fields", ["DESC", "DTYP"]),
         )
 
     def to_yaml(self, file_path: Path) -> None:
@@ -176,6 +183,7 @@ class EPICSDB2BOBConfig:
             "widget_widths": {
                 key.__name__: value for key, value in self.widget_widths.items()
             },
+            "required_record_fields": self.required_record_fields,
         }
         with open(file_path, "w") as f:
             yaml.dump(data, f, sort_keys=False)
@@ -195,4 +203,5 @@ class EPICSDB2BOBConfig:
             f"widget_offset={self.widget_offset}, "
             f"title_bar_heights={self.title_bar_heights}, "
             f"widget_widths={self.widget_widths}, "
+            f"required_record_fields={self.required_record_fields})"
         )
